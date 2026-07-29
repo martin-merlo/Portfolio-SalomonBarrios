@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------
+ * Self-hosted: PS Pimpdeed / PS Pimpdeed II
+ * Archivos pendientes — ver public/fonts/README.md. @font-face plano
+ * (en vez de next/font/local) para que un archivo ausente no rompa el
+ * build; el navegador cae al fallback monoespaciado del stack.
+ * ------------------------------------------------------------------- */
+@font-face {
+  font-family: 'PS Pimpdeed';
+  src: url('/fonts/PSPimpdeed.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PS Pimpdeed II';
+  src: url('/fonts/PSPimpdeedII.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Paleta — ver referencia/paleta.md. Exacta, sin color de acento. */
+  --color-tinta: #000014;
+  --color-navbar: #2a2a36;
+  --color-claro: #f7f6f2;
+  --color-papel: #f4f1e4;
+}
+
+@theme inline {
+  --color-tinta: var(--color-tinta);
+  --color-navbar: var(--color-navbar);
+  --color-claro: var(--color-claro);
+  --color-papel: var(--color-papel);
+
+  /* Display — Sekuya, un solo peso, uso exclusivo del título del hero. */
+  --font-display: var(--font-display-raw), 'Arial Black', sans-serif;
+
+  /* Mono — Cousine en reemplazo de Courier New (no se puede embeber). */
+  --font-mono: var(--font-cousine-raw), 'Courier New', Courier, monospace;
+
+  /* Subtítulos — PS Pimpdeed, self-hosted, fallback monoespaciado. */
+  --font-subtitulo: 'PS Pimpdeed', ui-monospace, 'Courier New', Courier, monospace;
+
+  /* Cuerpo — PS Pimpdeed II, self-hosted, fallback monoespaciado. */
+  --font-cuerpo: 'PS Pimpdeed II', ui-monospace, 'Courier New', Courier, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--color-papel);
+  color: var(--color-tinta);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-tinta);
+  outline-offset: 3px;
+}

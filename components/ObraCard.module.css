@@ -1,0 +1,58 @@
+.card {
+  cursor: pointer;
+}
+
+.hoverSlide {
+  transform: translateX(100%);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hoverOverlay {
+  opacity: 0;
+  transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.brillo {
+  transition: filter 0.3s ease;
+}
+
+.subrayado {
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.25s ease;
+}
+
+.card:focus-visible .hoverSlide {
+  transform: translateX(0);
+}
+.card:focus-visible .hoverOverlay {
+  opacity: 1;
+}
+.card:focus-visible .brillo {
+  filter: brightness(1.12);
+}
+.card:focus-visible .subrayado {
+  text-decoration-color: currentColor;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover .hoverSlide {
+    transform: translateX(0);
+  }
+  .card:hover .hoverOverlay {
+    opacity: 1;
+  }
+  .card:hover .brillo {
+    filter: brightness(1.12);
+  }
+  .card:hover .subrayado {
+    text-decoration-color: currentColor;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hoverSlide,
+  .hoverOverlay {
+    transition: none;
+  }
+}

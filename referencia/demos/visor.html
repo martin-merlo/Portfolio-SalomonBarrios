@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Demo — Zoom de detalle en obra</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root{
+    --bg:#f4f2ee; --ink:#17140f; --muted:#6b6558; --card-bg:#ece8e0; --line:#d9d4c8;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:var(--bg); color:var(--ink); font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; }
+
+  .note{
+    max-width:720px; margin:16px auto; padding:14px 18px;
+    border:1px solid var(--line); border-radius:4px;
+    font-size:13px; line-height:1.6; color:var(--muted);
+  }
+  .note b{ color:var(--ink); }
+
+  .gallery{
+    max-width:1000px; margin:0 auto; padding:20px 24px 100px;
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
+  }
+  @media (max-width:700px){ .gallery{ grid-template-columns:repeat(2,1fr);} }
+
+  .thumb{
+    position:relative; aspect-ratio:4/5; border-radius:3px; overflow:hidden;
+    cursor: zoom-in;
+  }
+  .thumb-caption{
+    margin-top:10px; font-size:13px; color:var(--muted); display:flex; justify-content:space-between;
+  }
+  .thumb-caption b{ color:var(--ink); font-weight:500; }
+
+  .grain{
+    position:absolute; inset:0; filter:url(#grain); opacity:0.3; mix-blend-mode:overlay; pointer-events:none;
+  }
+
+  /* Visor de detalle */
+  .viewer{
+    position:fixed; inset:0; background:rgba(12,11,9,0.97);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .35s ease;
+    z-index:200;
+  }
+  .viewer.active{ opacity:1; pointer-events:auto; }
+  .viewer-stage{
+    width:min(86vw, 900px); height:min(80vh, 900px);
+    position:relative; overflow:hidden; border-radius:4px;
+    touch-action:none; cursor:grab;
+  }
+  .viewer-stage.dragging{ cursor:grabbing; }
+  .viewer-img{
+    position:absolute; inset:0; transform-origin:0 0; will-change:transform;
+  }
+  .viewer-close{
+    position:absolute; top:24px; right:28px;
+    background:none; border:1px solid rgba(255,255,255,0.3); color:#fff;
+    font-size:13px; padding:8px 16px; border-radius:20px; cursor:pointer;
+  }
+  .viewer-close:hover{ border-color:#fff; }
+  .zoom-indicator{
+    position:absolute; top:24px; left:28px; color:#fff; font-size:12px;
+    letter-spacing:0.05em; opacity:0.7;
+  }
+  .viewer-hint{
+    position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+    color:#fff; font-size:12px; opacity:0.55; text-align:center; letter-spacing:0.02em;
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <filter id="grain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise"/>
+    <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0"/>
+  </filter>
+</svg>
+
+<div class="note">
+  <b>Demo de mecánica</b> — hacé click en cualquier obra para abrir el visor. Adentro: scrolleá (o pellizcá en mobile) para hacer zoom sobre el punto exacto del cursor, arrastrá para mover, doble click para zoom rápido. La textura granulada simula la superficie del óleo — con fotos reales de las obras este efecto es mucho más convincente.
+</div>
+
+<div class="gallery" id="gallery"></div>
+
+<div class="viewer" id="viewer">
+  <button class="viewer-close" id="viewerClose">✕ Cerrar</button>
+  <div class="zoom-indicator" id="zoomIndicator">100%</div>
+  <div class="viewer-stage" id="viewerStage">
+    <div class="viewer-img" id="viewerImg">
+      <div class="grain"></div>
+    </div>
+  </div>
+  <div class="viewer-hint">Scroll / pellizco: zoom &nbsp;·&nbsp; Arrastrar: mover &nbsp;·&nbsp; Doble click: zoom rápido</div>
+</div>
+
+<script>
+  const obras = [
+    { title:"Umbral",        tecnica:"Óleo sobre lienzo", año:"2024", grad:"linear-gradient(135deg,#8a3b2e,#d9803f 45%,#f2c14e)" },
+    { title:"Silencio Ocre", tecnica:"Técnica mixta",     año:"2023", grad:"linear-gradient(150deg,#3a3226,#7a6b4f 55%,#c9b98a)" },
+    { title:"Deriva",        tecnica:"Óleo sobre lienzo", año:"2025", grad:"linear-gradient(160deg,#1f3b3a,#3d6b63 50%,#9cc0a8)" },
+    { title:"Vestigio",      tecnica:"Acrílico",          año:"2024", grad:"linear-gradient(140deg,#4a1f2b,#8c3b4a 50%,#d98a7a)" },
+    { title:"Ceniza y Luz",  tecnica:"Técnica mixta",     año:"2022", grad:"linear-gradient(155deg,#21201d,#55524a 55%,#a89f8c)" },
+    { title:"Marea",         tecnica:"Óleo sobre lienzo", año:"2025", grad:"linear-gradient(145deg,#142838,#2f5470 50%,#9db8c9)" }
+  ];
+
+  const gallery = document.getElementById("gallery");
+  obras.forEach((obra, i) => {
+    const el = document.createElement("div");
+    el.innerHTML = `
+      <div class="thumb" data-index="${i}" style="background:${obra.grad}">
+        <div class="grain"></div>
+      </div>
+      <div class="thumb-caption"><b>${obra.title}</b><span>${obra.año}</span></div>
+    `;
+    gallery.appendChild(el);
+  });
+
+  // ---- Visor de detalle con zoom/pan ----
+  const viewer = document.getElementById("viewer");
+  const viewerStage = document.getElementById("viewerStage");
+  const viewerImg = document.getElementById("viewerImg");
+  const zoomIndicator = document.getElementById("zoomIndicator");
+  const viewerClose = document.getElementById("viewerClose");
+
+  const MIN_SCALE = 1, MAX_SCALE = 4;
+  let scale = 1, posX = 0, posY = 0;
+  let stageRect = null;
+
+  const qx = gsap.quickTo(viewerImg, "x", { duration: 0.35, ease: "power3.out" });
+  const qy = gsap.quickTo(viewerImg, "y", { duration: 0.35, ease: "power3.out" });
+  const qs = gsap.quickTo(viewerImg, "scale", { duration: 0.35, ease: "power3.out" });
+
+  function clamp(v, min, max){ return Math.min(max, Math.max(min, v)); }
+
+  function clampPos(){
+    if (!stageRect) return;
+    const minX = stageRect.width - stageRect.width * scale;
+    const minY = stageRect.height - stageRect.height * scale;
+    posX = clamp(posX, minX, 0);
+    posY = clamp(posY, minY, 0);
+  }
+
+  function applyTransform(){
+    clampPos();
+    qx(posX); qy(posY); qs(scale);
+    zoomIndicator.textContent = Math.round(scale * 100) + "%";
+  }
+
+  function openViewer(obra){
+    viewerImg.style.background = obra.grad;
+    scale = 1; posX = 0; posY = 0;
+    viewer.classList.add("active");
+    // el rect solo se puede medir una vez el visor es visible
+    requestAnimationFrame(() => {
+      stageRect = viewerStage.getBoundingClientRect();
+      gsap.set(viewerImg, { x:0, y:0, scale:1 });
+      zoomIndicator.textContent = "100%";
+    });
+  }
+  function closeViewer(){
+    viewer.classList.remove("active");
+  }
+
+  document.querySelectorAll(".thumb").forEach(t => {
+    t.addEventListener("click", () => openViewer(obras[t.dataset.index]));
+  });
+  viewerClose.addEventListener("click", closeViewer);
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeViewer(); });
+
+  window.addEventListener("resize", () => {
+    if (viewer.classList.contains("active")) stageRect = viewerStage.getBoundingClientRect();
+  });
+
+  // Zoom con rueda del mouse, anclado a la posición del cursor
+  viewerStage.addEventListener("wheel", e => {
+    e.preventDefault();
+    const rect = viewerStage.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const delta = -e.deltaY * 0.0016;
+    const newScale = clamp(scale + delta * scale, MIN_SCALE, MAX_SCALE);
+    posX = mx - (mx - posX) * (newScale / scale);
+    posY = my - (my - posY) * (newScale / scale);
+    scale = newScale;
+    applyTransform();
+  }, { passive: false });
+
+  // Doble click: zoom rápido dentro/fuera, anclado al punto clickeado
+  viewerStage.addEventListener("dblclick", e => {
+    const rect = viewerStage.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const target = scale > 1.4 ? 1 : 2.6;
+    posX = mx - (mx - posX) * (target / scale);
+    posY = my - (my - posY) * (target / scale);
+    scale = target;
+    applyTransform();
+  });
+
+  // Pan (mouse) + pan/pinch (touch) vía Pointer Events unificados
+  const pointers = new Map();
+  let dragging = false, lastX = 0, lastY = 0;
+  let lastPinchDist = null;
+
+  function dist(p1, p2){ return Math.hypot(p1.x - p2.x, p1.y - p2.y); }
+  function mid(p1, p2){ return { x:(p1.x+p2.x)/2, y:(p1.y+p2.y)/2 }; }
+
+  viewerStage.addEventListener("pointerdown", e => {
+    viewerStage.setPointerCapture(e.pointerId);
+    pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+    if (pointers.size === 1){
+      dragging = true; lastX = e.clientX; lastY = e.clientY;
+      viewerStage.classList.add("dragging");
+    } else if (pointers.size === 2){
+      dragging = false;
+      const pts = [...pointers.values()];
+      lastPinchDist = dist(pts[0], pts[1]);
+    }
+  });
+
+  viewerStage.addEventListener("pointermove", e => {
+    if (!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+
+    if (pointers.size === 1 && dragging){
+      const dx = e.clientX - lastX, dy = e.clientY - lastY;
+      lastX = e.clientX; lastY = e.clientY;
+      posX += dx; posY += dy;
+      applyTransform();
+    } else if (pointers.size === 2){
+      const pts = [...pointers.values()];
+      const d = dist(pts[0], pts[1]);
+      const rect = viewerStage.getBoundingClientRect();
+      const m = mid(pts[0], pts[1]);
+      const mx = m.x - rect.left, my = m.y - rect.top;
+
+      const newScale = clamp(scale * (d / lastPinchDist), MIN_SCALE, MAX_SCALE);
+      posX = mx - (mx - posX) * (newScale / scale);
+      posY = my - (my - posY) * (newScale / scale);
+      scale = newScale;
+      lastPinchDist = d;
+      applyTransform();
+    }
+  });
+
+  function endPointer(e){
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) lastPinchDist = null;
+    if (pointers.size === 0){
+      dragging = false;
+      viewerStage.classList.remove("dragging");
+    } else if (pointers.size === 1){
+      const remaining = [...pointers.values()][0];
+      lastX = remaining.x; lastY = remaining.y;
+      dragging = true;
+    }
+  }
+  viewerStage.addEventListener("pointerup", endPointer);
+  viewerStage.addEventListener("pointercancel", endPointer);
+</script>
+
+</body>
+</html>

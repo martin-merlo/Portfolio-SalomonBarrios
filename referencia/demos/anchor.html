@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Demo — Título anclado al navbar en scroll</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+  :root{
+    --bg: #f4f2ee;
+    --ink: #17140f;
+    --muted: #6b6558;
+    --card-bg: #ece8e0;
+    --line: #d9d4c8;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:var(--bg); color:var(--ink); font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; }
+
+  .note{
+    max-width:720px; margin:16px auto 0; padding:14px 18px;
+    border:1px solid var(--line); border-radius:4px;
+    font-size:13px; line-height:1.6; color:var(--muted);
+  }
+  .note b{ color:var(--ink); }
+
+  nav{
+    position: fixed; top:0; left:0; right:0; height:64px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 0 28px;
+    z-index: 50;
+  }
+  .nav-bg{
+    position:absolute; inset:0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    opacity: 0;
+  }
+  .nav-logo-slot{
+    position:relative;
+    height: 20px;
+    display:flex; align-items:center;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    z-index: 1;
+  }
+  .nav-links{
+    position:relative;
+    display:flex; gap:26px; z-index:1;
+    font-size:13px; color:var(--muted);
+  }
+
+  .hero{
+    height: 100vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding: 0 24px;
+  }
+  #heroTitle{
+    position: relative;
+    font-family: Georgia, "Times New Roman", serif;
+    font-weight:400;
+    font-size: clamp(40px, 8vw, 88px);
+    letter-spacing:-0.01em;
+    transform-origin: left center;
+    white-space: nowrap;
+  }
+  .hero-sub{
+    margin-top:18px; color:var(--muted); font-size:15px;
+  }
+  .scroll-hint{
+    position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+    font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted);
+  }
+
+  .filler{
+    max-width:1100px; margin:0 auto; padding: 40px 24px 160px;
+    display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
+  }
+  .block{
+    aspect-ratio: 4/5; border-radius:3px;
+  }
+</style>
+</head>
+<body>
+
+<div class="note">
+  <b>Demo de mecánica</b> — "Nombre del Artista" empieza grande y centrado como en el hero, y al scrollear se achica y se desplaza hasta ocupar su lugar en el navbar, quedando fijo ahí. El navbar también gana fondo sólido a medida que avanza el efecto.
+</div>
+
+<nav>
+  <div class="nav-bg"></div>
+  <span class="nav-logo-slot" id="navLogoSlot"></span>
+  <div class="nav-links">
+    <span>Obras</span><span>Sobre el artista</span><span>Contacto</span>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1 id="heroTitle">Nombre del Artista</h1>
+  <p class="hero-sub">Pintura · Óleo y técnica mixta</p>
+  <div class="scroll-hint">Scrolleá para ver el efecto ↓</div>
+</section>
+
+<section class="filler" id="filler"></section>
+
+<script>
+  gsap.registerPlugin(ScrollTrigger);
+
+  const filler = document.getElementById("filler");
+  const gradients = [
+    "linear-gradient(135deg,#8a3b2e,#f2c14e)",
+    "linear-gradient(150deg,#3a3226,#c9b98a)",
+    "linear-gradient(160deg,#1f3b3a,#9cc0a8)",
+    "linear-gradient(140deg,#4a1f2b,#d98a7a)",
+    "linear-gradient(155deg,#21201d,#a89f8c)",
+    "linear-gradient(145deg,#142838,#9db8c9)"
+  ];
+  gradients.forEach(g => {
+    const d = document.createElement("div");
+    d.className = "block";
+    d.style.background = g;
+    filler.appendChild(d);
+  });
+
+  const heroTitle = document.getElementById("heroTitle");
+  const navSlot = document.getElementById("navLogoSlot");
+  const navBg = document.querySelector(".nav-bg");
+  const heroSub = document.querySelector(".hero-sub");
+  const scrollHint = document.querySelector(".scroll-hint");
+
+  let st; // referencia al ScrollTrigger para poder refrescarlo en resize
+
+  function setupAnchorAnimation(){
+    // Limpiamos cualquier tween/trigger previo (por si hubo resize)
+    if (st) st.kill();
+    gsap.set(heroTitle, { clearProps: "all" });
+
+    const heroRect = heroTitle.getBoundingClientRect();
+    const navRect  = navSlot.getBoundingClientRect();
+
+    // Delta de posición entre donde está el título ahora y donde tiene que terminar (FLIP manual)
+    const deltaX = navRect.left - heroRect.left;
+    const deltaY = (navRect.top + navRect.height / 2) - (heroRect.top + heroRect.height / 2);
+    const scaleTarget = navRect.height / heroRect.height * 1.85; // 1.85 ~ proporción visual final deseada
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: document.body,
+        start: "top top",
+        end: "+=700",
+        scrub: 0.4,
+        onUpdate: (self) => { st.progress = self.progress; }
+      }
+    });
+
+    tl.to(heroTitle, { x: deltaX, y: deltaY, scale: scaleTarget, ease: "none" }, 0)
+      .to(navBg, { opacity: 1, ease: "none" }, 0)
+      .to([heroSub, scrollHint], { opacity: 0, y: -10, ease: "none" }, 0);
+
+    st = tl.scrollTrigger;
+  }
+
+  setupAnchorAnimation();
+
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(setupAnchorAnimation, 200);
+  });
+</script>
+
+</body>
+</html>
