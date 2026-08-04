@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Obra, TamanoGrilla } from '@/lib/tipos';
 import { fondoImagen } from '@/lib/imagen';
 import styles from './ObraCard.module.css';
@@ -8,23 +9,22 @@ const SPAN: Record<TamanoGrilla, string> = {
   chica: 'col-span-6 md:col-span-3 aspect-[2/1]',
 };
 
-export default function ObraCard({ obra, onAbrir }: { obra: Obra; onAbrir: () => void }) {
+/**
+ * Si la obra tiene página propia, la card navega a /obra/[slug] (cursor
+ * pointer). Si no, es puramente informativa: sin cursor de interacción y sin
+ * ninguna acción de click.
+ */
+export default function ObraCard({ obra }: { obra: Obra }) {
   const conHover = obra.tieneHover && !!obra.imagenHoverUrl;
+  const clickeable = obra.tienePaginaPropia;
+  const etiqueta = `${obra.titulo}${obra.tecnica ? `, ${obra.tecnica}` : ''}${obra.anio ? `, ${obra.anio}` : ''}`;
 
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onAbrir}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onAbrir();
-        }
-      }}
-      aria-label={`Ver obra ${obra.titulo}, ${obra.tecnica}, ${obra.anio}`}
-      className={`${styles.card} group relative overflow-hidden ${SPAN[obra.tamanoGrilla]}`}
-    >
+  const className = `${styles.card} group relative overflow-hidden ${SPAN[obra.tamanoGrilla]} ${
+    clickeable ? 'cursor-pointer' : 'cursor-default'
+  }`;
+
+  const contenido = (
+    <>
       <div
         className={`absolute inset-0 bg-cover bg-center ${!conHover ? styles.brillo : ''}`}
         style={{ backgroundImage: fondoImagen(obra.imagenUrl) }}
@@ -55,6 +55,20 @@ export default function ObraCard({ obra, onAbrir }: { obra: Obra; onAbrir: () =>
       >
         {obra.titulo}
       </span>
+    </>
+  );
+
+  if (clickeable) {
+    return (
+      <Link href={`/obra/${obra.slug}`} aria-label={`Ver obra ${etiqueta}`} className={className}>
+        {contenido}
+      </Link>
+    );
+  }
+
+  return (
+    <div aria-label={etiqueta} className={className}>
+      {contenido}
     </div>
   );
 }

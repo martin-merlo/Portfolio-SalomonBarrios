@@ -1,4 +1,3 @@
-import { Suspense } from 'react';
 import { getContenido, getObras, getProceso } from '@/lib/datos';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -8,6 +7,10 @@ import Work from '@/components/Work';
 import Cav from '@/components/Cav';
 import Proceso from '@/components/Proceso';
 import Contacto from '@/components/Contacto';
+
+// El contenido lo edita el artista desde el panel — no hace falta que sea
+// instantáneo, así que revalidamos cada 60s en vez de forzar dynamic total.
+export const revalidate = 60;
 
 export default async function Home() {
   const [contenido, obras, proceso] = await Promise.all([
@@ -23,9 +26,7 @@ export default async function Home() {
         <Hero contenido={contenido} />
         <PaperSurface>
           <Bio texto={contenido.bioTexto} />
-          <Suspense fallback={null}>
-            <Work obras={obras} />
-          </Suspense>
+          <Work obras={obras} />
           <Cav texto={contenido.cvTexto} />
           <Proceso items={proceso} />
           <Contacto contenido={contenido} />

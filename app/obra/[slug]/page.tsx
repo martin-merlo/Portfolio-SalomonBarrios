@@ -1,0 +1,75 @@
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { getContenido, getObraBySlug } from '@/lib/datos';
+import NavbarObra from '@/components/NavbarObra';
+import ObraHero from '@/components/ObraHero';
+import PaperSurface from '@/components/PaperSurface';
+import SectionLabel from '@/components/SectionLabel';
+import { fondoImagen } from '@/lib/imagen';
+
+// El artista va a estar editando obras desde el panel más adelante — no hace
+// falta que el contenido sea instantáneo, así que revalidamos cada 60s.
+export const revalidate = 60;
+
+type Params = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { slug } = await params;
+  const obra = await getObraBySlug(slug);
+  if (!obra) return {};
+
+  return {
+    title: `${obra.titulo} — Salomón Barrios`,
+    description: obra.descripcion,
+  };
+}
+
+export default async function ObraPage({ params }: Params) {
+  const { slug } = await params;
+  const [obra, contenido] = await Promise.all([getObraBySlug(slug), getContenido()]);
+
+  if (!obra) notFound();
+
+  const tieneContenidoExtra = Boolean(
+    obra.subtituloExtendido || obra.textoExtendido || obra.imagenes.length > 0,
+  );
+
+  return (
+    <>
+      <NavbarObra nombreArtista={contenido.heroTitulo} />
+      <main>
+        <ObraHero titulo={obra.titulo} imagenUrl={obra.imagenUrl} descripcion={obra.descripcion} />
+
+        {tieneContenidoExtra && (
+          <PaperSurface>
+            <section className="px-5 sm:px-10 lg:px-14 pt-20 sm:pt-28 pb-20 sm:pb-28">
+              <div className="max-w-[1500px] mx-auto">
+                {obra.subtituloExtendido && <SectionLabel texto={obra.subtituloExtendido} />}
+
+                {obra.textoExtendido && (
+                  <div className="font-cuerpo text-tinta text-sm sm:text-base leading-relaxed space-y-4 mb-12">
+                    {obra.textoExtendido.split('\n\n').map((parrafo, i) => (
+                      <p key={i}>{parrafo}</p>
+                    ))}
+                  </div>
+                )}
+
+                {obra.imagenes.length > 0 && (
+                  <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-2">
+                    {obra.imagenes.map((imagen) => (
+                      <div
+                        key={imagen.id}
+                        className="relative shrink-0 w-64 sm:w-80 aspect-[4/3] bg-cover bg-center rounded-sm"
+                        style={{ backgroundImage: fondoImagen(imagen.imagenUrl) }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </section>
+          </PaperSurface>
+        )}
+      </main>
+    </>
+  );
+}
