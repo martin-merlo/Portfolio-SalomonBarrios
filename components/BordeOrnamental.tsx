@@ -89,7 +89,35 @@ export default function BordeOrnamental() {
       },
     });
 
-    return () => st.kill();
+    // 'bottom bottom' se resuelve a un scrollY absoluto en el momento del
+    // create(), que puede ser bastante antes de que el alto real del
+    // documento termine de asentarse (medido: el body pasa de ~3538px a
+    // ~5683px recién cuando document.fonts.ready resuelve, por el reflow
+    // del swap de la fuente real). Sin refrescar, ese 'end' queda corto:
+    // pasado ese punto el trigger deja de estar activo y el borde se
+    // congela en vez de seguir la proporción 0.5 hasta el final real de la
+    // página. Mismo patrón de recálculo que el título anclado (Navbar) y
+    // la paginación del CV (Cav): resize con debounce + fonts.ready. Sumamos
+    // un ResizeObserver sobre <body> porque el reflow que dispara esto no
+    // llega a través de un evento 'resize' de window.
+    let refreshTimer: ReturnType<typeof setTimeout>;
+    function refrescar() {
+      clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(() => st.refresh(), 200);
+    }
+
+    window.addEventListener('resize', refrescar);
+    document.fonts?.ready?.then(refrescar);
+
+    const ro = new ResizeObserver(refrescar);
+    ro.observe(document.body);
+
+    return () => {
+      window.removeEventListener('resize', refrescar);
+      ro.disconnect();
+      clearTimeout(refreshTimer);
+      st.kill();
+    };
   }, []);
 
   return (
@@ -98,7 +126,7 @@ export default function BordeOrnamental() {
         ref={izqOuterRef}
         aria-hidden="true"
         className={`absolute inset-y-0 left-0 overflow-hidden ${ANCHO_BORDE}`}
-        style={{ pointerEvents: 'none', mixBlendMode: 'overlay', opacity: 0.75 }}
+        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: 0.75 }}
       >
         <div
           ref={izqInnerRef}
@@ -116,7 +144,7 @@ export default function BordeOrnamental() {
         ref={derOuterRef}
         aria-hidden="true"
         className={`absolute inset-y-0 right-0 overflow-hidden ${ANCHO_BORDE}`}
-        style={{ pointerEvents: 'none', mixBlendMode: 'overlay', opacity: 0.75 }}
+        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: 0.75 }}
       >
         <div
           ref={derInnerRef}
