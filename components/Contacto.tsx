@@ -62,7 +62,7 @@ export default function Contacto({ contenido }: { contenido: ContenidoSitio }) {
   return (
     <section id="contacto" className="px-5 sm:px-10 lg:px-14 pb-24 sm:pb-32">
       <div className="max-w-[1500px] mx-auto">
-        <SectionLabel texto="Contactame.4" />
+        <SectionLabel texto="Contactame.4" entradaPanel />
 
         <div className="flex flex-col items-center text-center gap-5 sm:gap-6 py-6 sm:py-10">
           <a
