@@ -17,7 +17,20 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
       <div className="absolute inset-0 bg-tinta/45" aria-hidden="true" />
 
       <div className="relative z-10 h-full max-w-[1500px] mx-auto px-5 sm:px-10 lg:px-14 pt-16 md:pt-0 flex flex-col justify-center gap-10 md:flex-row md:items-center md:justify-between md:gap-12">
-        <div>
+        {/*
+          lg:pl-24/xl:pl-32 acá son a propósito, no relleno cosmético: el
+          Navbar mide en vivo la distancia entre este título y su slot en
+          el navbar (que vive con su propio inset, mucho más ajustado:
+          px-3/8/12) para animar el "vuelo" del título al anclarse. Sin este
+          inset extra, en anchos de escritorio comunes (~1280–1536px) el
+          padding del hero y el del navbar casi coinciden y el desplazamiento
+          horizontal medido queda en unos pocos píxeles contra ~350px de
+          desplazamiento vertical — la trayectoria se ve prácticamente
+          recta hacia arriba en vez de diagonal hacia arriba-izquierda como
+          en diseño.pdf. Este inset solo se nota en desktop (lg:+): mobile
+          usa crossfade en vez de mover el título, así que no lo necesita.
+        */}
+        <div className="lg:pl-24 xl:pl-32">
           <h1
             id="hero-title"
             className="font-display uppercase text-claro leading-[0.92] text-[15vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]"

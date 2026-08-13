@@ -30,34 +30,6 @@ function IconoTikTok() {
   );
 }
 
-/**
- * Firma manuscrita — no hay asset del artista todavía (a diferencia del
- * patrón ornamental y la ola, esto no está listado como pendiente en
- * paleta.md, pero tampoco existe el archivo real). Placeholder gráfico
- * abstracto, no texto inventado.
- */
-function FirmaPlaceholder() {
-  return (
-    <svg
-      width="180"
-      height="70"
-      viewBox="0 0 180 70"
-      fill="none"
-      aria-label="Firma del artista (placeholder, pendiente el asset real)"
-      role="img"
-    >
-      <path
-        d="M8 45 C 20 15, 30 15, 34 40 C 37 58, 45 45, 50 30 C 54 18, 58 45, 64 45 C 72 45, 78 20, 86 35 C 92 46, 100 30, 110 30 C 122 30, 128 50, 140 42 C 150 36, 156 22, 168 26"
-        stroke="var(--color-tinta)"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        fill="none"
-        opacity="0.85"
-      />
-    </svg>
-  );
-}
-
 export default function Contacto({ contenido }: { contenido: ContenidoSitio }) {
   return (
     <section id="contacto" className="px-5 sm:px-10 lg:px-14 pb-24 sm:pb-32">
@@ -100,7 +72,14 @@ export default function Contacto({ contenido }: { contenido: ContenidoSitio }) {
           </div>
 
           <div className="mt-10 sm:mt-16">
-            <FirmaPlaceholder />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/imagenes/firma.png"
+              alt="Firma de Salomón Barrios"
+              width={180}
+              height={180}
+              className="w-[140px] sm:w-[180px] h-auto"
+            />
           </div>
         </div>
       </div>

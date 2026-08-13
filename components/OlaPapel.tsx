@@ -15,6 +15,9 @@ export default function OlaPapel() {
       style={{
         aspectRatio: '1281 / 310',
         backgroundColor: 'var(--color-papel)',
+        backgroundImage: "url('/imagenes/textura-papel.webp')",
+        backgroundPosition: 'top center',
+        backgroundRepeat: 'repeat-y',
         maskImage: "url('/imagenes/forma-recorte.png')",
         WebkitMaskImage: "url('/imagenes/forma-recorte.png')",
         maskRepeat: 'no-repeat',

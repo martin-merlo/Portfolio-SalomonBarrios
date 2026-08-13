@@ -21,19 +21,30 @@ import BordeOrnamental from './BordeOrnamental';
  * hero — y va ANTES que {children} sin z-index propio para que cualquier
  * contenido opaco de las secciones (las cards del work, por ejemplo) lo
  * tape de verdad en vez de quedar por encima.
+ *
+ * overflow-clip acá es necesario, no cosmético: BordeOrnamental traslada
+ * (translateY, ligado al scroll) una tira position:absolute inset-y-0 a
+ * esta misma caja. Aunque esa tira recorta su propio contenido con
+ * overflow-hidden, el navegador de todos modos suma la posición ya
+ * trasladada de la tira al scrollable-overflow de sus ancestros en cuanto
+ * ninguno de ellos recorta — y ni <body> ni <main> lo hacen. Sin este
+ * overflow-clip, cada pixel de scroll agrega ~0.5px de alto fantasma al
+ * documento (crecía sin límite mientras el usuario scrolleaba), dejando
+ * una franja en blanco después de la firma. Verificado en vivo: sin este
+ * recorte, document.scrollingElement.scrollHeight seguía creciendo con el
+ * scroll; con él, se mantiene fijo apenas termina de asentar el contenido.
  */
 export default function PaperSurface({ children }: { children: ReactNode }) {
   return (
-    <div className="relative z-10">
+    <div className="relative z-10 overflow-clip">
       <BordeOrnamental />
       <OlaPapel />
       <div
         className="relative bg-papel"
         style={{
           backgroundImage: 'url(/imagenes/textura-papel.webp)',
-          backgroundSize: 'cover',
           backgroundPosition: 'top center',
-          backgroundRepeat: 'no-repeat',
+          backgroundRepeat: 'repeat-y',
         }}
       >
         {children}
