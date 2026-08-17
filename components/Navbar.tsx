@@ -145,17 +145,35 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
         0,
       ).to(navBg, { opacity: NAVBG_MAX_OPACITY, ease: 'none', duration: 1 }, 0);
       if (heroSub) tl.to(heroSub, { opacity: 0, y: -10, ease: 'none', duration: 1 }, 0);
-      // El hero queda sticky (pinned) detrás de todo el resto de la página
-      // para el efecto "el papel tapa al hero", así que el título que voló
-      // hasta acá queda tapado por el gradiente del navbar (z-50, por
-      // encima del hero z-0) apenas navBg llega a su opacidad plena en
-      // t=1. Por eso el "aterrizaje" real es este fade-in de navSlot — vive
-      // dentro de <nav>, por encima de su propio fondo — no el título del
-      // hero llegando literalmente. Arranca en t=0.7, ANTES de que navBg
-      // termine de taparlo en t=1, así hay superposición real entre ambas
-      // curvas de opacidad y nunca queda un tramo sin ninguna de las dos
-      // copias visible.
-      tl.to(navSlot, { opacity: 1, ease: 'none', duration: 0.5 }, 0.7);
+      // Cruce de las dos copias del título ("que vuela" vs. la fija del
+      // navbar). OJO antes de tocar esto: las dos curvas de opacidad se
+      // superponen A PROPÓSITO — es la solución a un bug de hace varias
+      // iteraciones donde, en cierto tramo del scroll, no se veía NINGUNA de
+      // las dos copias (un hueco). No eliminar la superposición; solo se
+      // ajustó SU TIMING.
+      //
+      // heroTitle (la que vuela) se queda en opacity:1 toda la trayectoria y
+      // recién se apaga en el 10% final (0.9→1), cuando por el tween de
+      // arriba ya está prácticamente encima de su destino (x/y/scale también
+      // llegan a su valor final en t=1). navSlot (la copia fija) arranca su
+      // fade-in un poco antes, en 0.85, así que entre 0.85 y 0.9 aparece sola
+      // y suave (todavía sin competencia, la que vuela sigue a opacity:1) y
+      // de 0.9 a 1 ambas transicionan juntas en la MISMA zona del navbar —
+      // eso es lo que hace que el cruce no se lea como "dos títulos"
+      // separados pisándose, que es justo lo que pasaba cuando la
+      // trayectoria se hizo más diagonal (la que volaba todavía estaba lejos
+      // del destino, a opacity:1, cuando la copia fija ya estaba apareciendo).
+      //
+      // Todos los tweens de este timeline (posición, navBg, heroSub, y estos
+      // dos) terminan exactamente en t=1 — ningún tween se extiende más
+      // allá — así el timeline entero dura 1 y el progreso de scroll mapea
+      // 1:1 al tiempo del timeline. (Antes navSlot arrancaba en 0.7 con
+      // duration 0.5, terminando en t=1.2: eso estiraba la duración total del
+      // timeline a 1.2 y desincronizaba scroll-progress de tiempo-de-tween,
+      // que es la causa real de por qué la copia fija aparecía mientras la
+      // que volaba todavía estaba a mitad de camino.)
+      tl.to(heroTitle, { opacity: 0, ease: 'none', duration: 0.1 }, 0.9);
+      tl.to(navSlot, { opacity: 1, ease: 'none', duration: 0.15 }, 0.85);
       st = tl.scrollTrigger;
     }
 
@@ -194,7 +212,7 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
       >
         {heroTitulo}
       </span>
-      <ul className="relative z-10 flex gap-2 sm:gap-7 font-mono font-bold uppercase text-[0.55rem] sm:text-sm tracking-wide text-claro shrink-0">
+      <ul className="relative z-10 flex gap-2 sm:gap-6 lg:gap-8 font-mono font-bold uppercase text-xs sm:text-base lg:text-lg tracking-wide text-claro shrink-0">
         {ITEMS.map((item) => (
           <li key={item.label}>
             <a href={item.href} className="hover:opacity-70 transition-opacity">

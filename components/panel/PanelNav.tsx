@@ -41,7 +41,13 @@ export default function PanelNav() {
           );
         })}
       </ul>
-      <div className="p-4 border-t border-slate-700">
+      <div className="p-4 border-t border-slate-700 flex flex-col gap-2 items-start">
+        <Link
+          href="/"
+          className="text-sm text-slate-400 hover:text-white transition-colors"
+        >
+          Volver al sitio
+        </Link>
         <button
           type="button"
           onClick={cerrarSesion}

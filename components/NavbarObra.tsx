@@ -101,7 +101,7 @@ export default function NavbarObra({ nombreArtista }: { nombreArtista: string })
       >
         {nombreArtista}
       </Link>
-      <ul className="relative z-10 flex gap-2 sm:gap-7 font-mono font-bold uppercase text-[0.55rem] sm:text-sm tracking-wide text-claro shrink-0">
+      <ul className="relative z-10 flex gap-2 sm:gap-6 lg:gap-8 font-mono font-bold uppercase text-xs sm:text-base lg:text-lg tracking-wide text-claro shrink-0">
         {ITEMS.map((item) => (
           <li key={item.label}>
             <a href={item.href} className="hover:opacity-70 transition-opacity">

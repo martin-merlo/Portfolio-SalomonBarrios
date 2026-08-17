@@ -32,7 +32,9 @@ export default function ObraHero({
 
       <div className="relative z-10 h-full max-w-[1500px] mx-auto px-5 sm:px-10 lg:px-14 pt-16 md:pt-0 flex flex-col justify-center gap-10 md:flex-row md:items-center md:justify-between md:gap-12">
         <div>
-          <h1 className="font-display uppercase text-claro leading-[0.92] text-[15vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]">
+          {/* text-[12vw], no 15vw: ver la misma nota en Hero.tsx — con 15vw un
+              título largo se sale del viewport en 360/390px. */}
+          <h1 className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]">
             {titulo}
           </h1>
         </div>

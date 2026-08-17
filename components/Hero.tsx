@@ -37,9 +37,22 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
           lo necesita.
         */}
         <div className="lg:pl-48 xl:pl-64">
+          {/*
+            text-[12vw] en vez de 15vw: medido en vivo, "SALOMÓN BARRIOS" con
+            15vw se salía del viewport por ~45px en 360/390px (el hero recorta
+            con overflow-hidden, así que no se veía un scrollbar horizontal,
+            se veía directamente la palabra cortada). La medición se hizo con
+            el fallback real que Next genera para Sekuya ("sekuya Fallback",
+            aproximado a Arial Black) porque el archivo de la fuente todavía
+            no está — ver public/fonts/README.md — que es justo el escenario
+            más ancho que hay que cubrir. 12vw entra con margen en 320–639px;
+            sm/md/lg quedan iguales (no hacía falta tocarlos, no se cortaban).
+            break-words como red de seguridad si algún título más largo
+            entrara por el panel.
+          */}
           <h1
             id="hero-title"
-            className="font-display uppercase text-claro leading-[0.92] text-[15vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]"
+            className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]"
             style={{ transformOrigin: 'left center', position: 'relative' }}
           >
             {contenido.heroTitulo}
@@ -49,11 +62,13 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
           </p>
         </div>
 
-        <div className="max-w-sm md:mt-2 md:text-right">
-          <h2 className="font-mono uppercase tracking-wide text-claro text-sm sm:text-base mb-3">
+        {/* Alineado a la izquierda (pedido del artista, diseño original) y
+            agrandado — antes text-sm/base y text-xs/sm, quedaba chico. */}
+        <div className="max-w-sm md:mt-2">
+          <h2 className="font-mono uppercase tracking-wide text-claro text-base sm:text-lg lg:text-xl mb-3">
             {contenido.declaracionTitulo}
           </h2>
-          <p className="font-mono text-claro/85 text-xs sm:text-sm leading-relaxed text-left md:text-right">
+          <p className="font-mono text-claro/85 text-sm sm:text-base lg:text-lg leading-relaxed text-left">
             {contenido.declaracionTexto}
           </p>
         </div>
