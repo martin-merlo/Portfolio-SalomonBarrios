@@ -48,6 +48,8 @@ export default function ObraCard({ obra }: { obra: Obra }) {
         </>
       )}
 
+      <div aria-hidden="true" className={`absolute inset-0 ${styles.veloTitulo}`} />
+
       <span
         className={`absolute bottom-3 left-4 sm:bottom-4 sm:left-5 z-10 font-mono text-claro text-sm sm:text-base ${
           !conHover ? styles.subrayado : ''

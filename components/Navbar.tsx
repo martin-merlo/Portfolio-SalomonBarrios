@@ -7,14 +7,20 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 const ITEMS = [
-  { label: 'SOCIALS', href: '#contacto' },
   { label: 'BIO', href: '#bio' },
-  { label: 'CAV', href: '#cav' },
   { label: 'WORK', href: '#work' },
+  { label: 'CV', href: '#cav' },
+  { label: 'SOCIALS', href: '#contacto' },
 ];
 
 const BREAKPOINT_MOBILE = '(max-width: 767px)';
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+
+// Fondo del navbar: gradiente vertical (color navbar → transparente, stops a
+// full alpha) en vez de color plano. NAVBG_MAX_OPACITY es la opacidad global
+// del elemento — 80% pedido por el artista — y es el techo al que anima con
+// el scroll (antes 1, fondo sólido).
+const NAVBG_MAX_OPACITY = 0.8;
 
 /**
  * Título anclado al navbar — mecánica portada de referencia/demos/anchor.html.
@@ -67,8 +73,9 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
       if (mmReduced.matches) {
         // Sin scrub: estado final estático de una, nada ligado al scroll.
         // El título grande queda como está en el hero; el navbar ya arranca
-        // sólido con su propia copia chica (ver nota de stacking más abajo).
-        gsap.set(navBg, { opacity: 1 });
+        // con su gradiente pleno y su propia copia chica (ver nota de
+        // stacking más abajo).
+        gsap.set(navBg, { opacity: NAVBG_MAX_OPACITY });
         gsap.set(navSlot, { visibility: 'visible', opacity: 1 });
         return;
       }
@@ -89,7 +96,7 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
           { opacity: 1, ease: 'none' },
           0,
         );
-        tl.to(navBg, { opacity: 1, ease: 'none' }, 0);
+        tl.to(navBg, { opacity: NAVBG_MAX_OPACITY, ease: 'none' }, 0);
         if (heroSub) tl.to(heroSub, { opacity: 0, ease: 'none' }, 0);
         st = tl.scrollTrigger;
         return;
@@ -116,14 +123,32 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
       });
       tl.to(
         heroTitle,
-        { x: deltaX, y: deltaY, scale: scaleTarget, ease: 'none', duration: 1 },
+        {
+          x: deltaX,
+          y: deltaY,
+          scale: scaleTarget,
+          // deltaX/deltaY están medidos borde-izquierdo a borde-izquierdo
+          // (navRect.left - heroRect.left), así que el ancla del scale tiene
+          // que ser ese mismo borde izquierdo para que el cálculo cierre. El
+          // style inline transformOrigin:'left center' del h1 (Hero.tsx) NO
+          // alcanza: gsap, la primera vez que anima un transform en un
+          // elemento sin que el propio tween declare transformOrigin, lo
+          // pisa a su default '50% 50%' escribiéndolo inline él mismo — deja
+          // el ancla en el centro sin avisar. Sin esto la escala tira el
+          // título hacia la derecha (la mitad de su ancho original, sin
+          // escalar) y se come buena parte del corrimiento a la izquierda
+          // que pide deltaX, dejando la trayectoria casi vertical otra vez.
+          transformOrigin: 'left center',
+          ease: 'none',
+          duration: 1,
+        },
         0,
-      ).to(navBg, { opacity: 1, ease: 'none', duration: 1 }, 0);
+      ).to(navBg, { opacity: NAVBG_MAX_OPACITY, ease: 'none', duration: 1 }, 0);
       if (heroSub) tl.to(heroSub, { opacity: 0, y: -10, ease: 'none', duration: 1 }, 0);
       // El hero queda sticky (pinned) detrás de todo el resto de la página
       // para el efecto "el papel tapa al hero", así que el título que voló
-      // hasta acá queda tapado para siempre por el fondo sólido del navbar
-      // (z-50, por encima del hero z-0) apenas navBg llega a opacity:1 en
+      // hasta acá queda tapado por el gradiente del navbar (z-50, por
+      // encima del hero z-0) apenas navBg llega a su opacidad plena en
       // t=1. Por eso el "aterrizaje" real es este fade-in de navSlot — vive
       // dentro de <nav>, por encima de su propio fondo — no el título del
       // hero llegando literalmente. Arranca en t=0.7, ANTES de que navBg
@@ -155,7 +180,12 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 h-16 sm:h-[72px] flex items-center justify-between gap-2 px-3 sm:px-8 lg:px-12">
-      <div ref={navBgRef} className="absolute inset-0 opacity-0 bg-navbar" />
+      <div
+        ref={navBgRef}
+        aria-hidden="true"
+        className="absolute inset-0 opacity-0"
+        style={{ backgroundImage: 'linear-gradient(to bottom, var(--color-navbar), transparent)' }}
+      />
       <span
         ref={navSlotRef}
         aria-hidden="true"

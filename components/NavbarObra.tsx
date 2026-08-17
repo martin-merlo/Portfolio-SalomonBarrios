@@ -9,24 +9,29 @@ gsap.registerPlugin(ScrollTrigger);
 
 const ITEMS = [
   { label: 'BIO', href: '/#bio' },
-  { label: 'CAV', href: '/#cav' },
   { label: 'WORK', href: '/#work' },
+  { label: 'CV', href: '/#cav' },
+  { label: 'SOCIALS', href: '/#contacto' },
 ];
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
+
+// Ver misma constante en Navbar.tsx: opacidad global del gradiente del
+// fondo del navbar, 80% pedido por el artista.
+const NAVBG_MAX_OPACITY = 0.8;
 
 /**
  * Navbar de las páginas /obra/[slug]. A diferencia del Navbar del home, acá
  * el nombre del artista es chico y fijo siempre — sin la animación de
  * anclado, que es exclusiva del home (acá el protagonista del hero es el
- * título de la obra). Funciona como link a "/". Los otros tres items no
+ * título de la obra). Funciona como link a "/". Los otros cuatro items no
  * apuntan a secciones de esta página (no existen acá) sino de vuelta al home.
  *
  * Mismo criterio de transparencia que el Navbar del home: arranca sin fondo
- * (solo texto flotando sobre el hero) y gana el fondo sólido oscuro con
- * scrub a medida que se scrollea, en la misma distancia que tarda
- * ObraHero (sticky, z-0) en quedar tapado por PaperSurface. Sin la
- * animación de posición del título porque ObraHero no tiene ese mecanismo.
+ * (solo texto flotando sobre el hero) y gana el gradiente oscuro con scrub
+ * a medida que se scrollea, en la misma distancia que tarda ObraHero
+ * (sticky, z-0) en quedar tapado por PaperSurface. Sin la animación de
+ * posición del título porque ObraHero no tiene ese mecanismo.
  */
 export default function NavbarObra({ nombreArtista }: { nombreArtista: string }) {
   const navBgRef = useRef<HTMLDivElement>(null);
@@ -47,7 +52,7 @@ export default function NavbarObra({ nombreArtista }: { nombreArtista: string })
       gsap.set(navBg, { clearProps: 'opacity' });
 
       if (mmReduced.matches) {
-        gsap.set(navBg, { opacity: 1 });
+        gsap.set(navBg, { opacity: NAVBG_MAX_OPACITY });
         return;
       }
 
@@ -61,7 +66,7 @@ export default function NavbarObra({ nombreArtista }: { nombreArtista: string })
         start: 'top top',
         end: `+=${heroHeight}`,
         scrub: 0.4,
-        onUpdate: (self) => gsap.set(navBg, { opacity: self.progress }),
+        onUpdate: (self) => gsap.set(navBg, { opacity: self.progress * NAVBG_MAX_OPACITY }),
       });
     }
 
@@ -84,7 +89,12 @@ export default function NavbarObra({ nombreArtista }: { nombreArtista: string })
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 h-16 sm:h-[72px] flex items-center justify-between gap-2 px-3 sm:px-8 lg:px-12">
-      <div ref={navBgRef} className="absolute inset-0 opacity-0 bg-navbar" />
+      <div
+        ref={navBgRef}
+        aria-hidden="true"
+        className="absolute inset-0 opacity-0"
+        style={{ backgroundImage: 'linear-gradient(to bottom, var(--color-navbar), transparent)' }}
+      />
       <Link
         href="/"
         className="relative z-10 font-display uppercase text-claro leading-none whitespace-nowrap shrink-0 text-base sm:text-lg hover:opacity-80 transition-opacity"

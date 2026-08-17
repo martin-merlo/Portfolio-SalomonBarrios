@@ -76,9 +76,9 @@ export default function Contacto({ contenido }: { contenido: ContenidoSitio }) {
             <img
               src="/imagenes/firma.png"
               alt="Firma de Salomón Barrios"
-              width={180}
-              height={180}
-              className="w-[140px] sm:w-[180px] h-auto"
+              width={360}
+              height={360}
+              className="w-[280px] sm:w-[360px] h-auto"
             />
           </div>
         </div>

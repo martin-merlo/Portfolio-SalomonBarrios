@@ -12,6 +12,18 @@
   transition: filter 0.3s ease;
 }
 
+/*
+ * Velo para que el título (siempre superpuesto sobre la imagen, con o sin
+ * hover) se lea sin tapar la obra. Valor dado por el artista desde InDesign:
+ * gradiente oscuro de abajo hacia arriba, mix-blend-mode: multiply,
+ * opacidad 0.5 sobre la capa entera.
+ */
+.veloTitulo {
+  background: linear-gradient(to top, var(--color-tinta) 0%, transparent 65%);
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
 .subrayado {
   text-decoration-line: underline;
   text-decoration-color: transparent;

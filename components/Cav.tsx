@@ -131,8 +131,18 @@ export default function Cav({ texto }: { texto: string }) {
           ref={contenedorRef}
           className="relative overflow-hidden h-[360px] sm:h-[420px] lg:h-[460px]"
         >
+          {/*
+           * Capa soft-light detrás del texto (valor de InDesign del
+           * artista): mismo color claro que el texto usa en otras secciones,
+           * mix-blend-mode: soft-light al 100%, para levantar el contraste
+           * contra la textura de papel de PaperSurface. Necesita su propio
+           * "relative" en el track de abajo: dos elementos posicionados se
+           * apilan por orden en el DOM, así que esta capa (declarada primero)
+           * queda debajo del texto sin depender de z-index.
+           */}
+          <div aria-hidden="true" className="absolute inset-0 bg-claro mix-blend-soft-light" />
           <div
-            className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:duration-0"
+            className="relative flex h-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:duration-0"
             style={{ transform: `translateX(-${pagina * 100}%)` }}
           >
             {paginas.map((contenido, i) => (
