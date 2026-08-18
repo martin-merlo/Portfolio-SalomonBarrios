@@ -141,7 +141,7 @@ export default function BordeOrnamental() {
         ref={izqOuterRef}
         aria-hidden="true"
         className={`absolute inset-y-0 left-0 overflow-hidden ${ANCHO_BORDE}`}
-        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: 0.75 }}
+        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: 0.45 }}
       >
         <div
           ref={izqInnerRef}
@@ -159,7 +159,7 @@ export default function BordeOrnamental() {
         ref={derOuterRef}
         aria-hidden="true"
         className={`absolute inset-y-0 right-0 overflow-hidden ${ANCHO_BORDE}`}
-        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: 0.75 }}
+        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: 0.45 }}
       >
         <div
           ref={derInnerRef}
