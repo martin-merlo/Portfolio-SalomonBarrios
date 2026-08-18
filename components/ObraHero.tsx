@@ -22,7 +22,7 @@ export default function ObraHero({
       id="obra-hero"
       className="sticky top-0 z-0 w-full overflow-hidden bg-tinta"
       style={{
-        height: 'calc(100vh - 48px)',
+        height: 'calc(100vh - 100px)',
         backgroundImage: fondoImagen(imagenUrl),
         backgroundSize: 'cover',
         backgroundPosition: 'center',

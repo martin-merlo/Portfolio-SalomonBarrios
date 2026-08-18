@@ -16,16 +16,32 @@ import BordeOrnamental from './BordeOrnamental';
  * contenedor raíz transparente, la zona enmascarada de OlaPapel deja ver
  * de verdad al hero (z-0) por debajo.
  *
- * BordeOrnamental vive acá adentro (no global en page.tsx) para quedar
- * acotado exactamente a esta sección de fondo claro — nunca sobre el
- * hero — y va ANTES que {children} sin z-index propio para que cualquier
- * contenido opaco de las secciones (las cards del work, por ejemplo) lo
- * tape de verdad en vez de quedar por encima.
+ * BordeOrnamental vive DENTRO del wrapper de la textura (después de su
+ * propio fondo, antes que {children}), no como sibling de este div ni
+ * global en page.tsx — dos motivos, uno de posición y uno de stacking:
+ *   1. Posición: así queda acotado exactamente al alto de la textura de
+ *      papel, que arranca recién después de OlaPapel — nunca se renderiza
+ *      sobre el hero ni sobre la costura hero-papel.
+ *   2. Stacking (el bug real que hubo acá): BordeOrnamental usa
+ *      position:absolute, y este wrapper de la textura usa position:relative
+ *      — los dos son "positioned" con z-index:auto. Cuando BordeOrnamental
+ *      vivía COMO SIBLING antes de este wrapper, el orden de pintado de
+ *      z-index:auto entre positioned siblings se decide por orden de
+ *      documento, y este wrapper (que pinta DESPUÉS en el DOM) tapaba por
+ *      completo al borde con su propio fondo opaco (bg-papel + textura) en
+ *      toda su altura — el borde solo se veía en la franja de arriba donde
+ *      este wrapper todavía no había empezado, exactamente la costura
+ *      hero-papel, que es justo donde NO debía verse, y nunca en las
+ *      secciones reales (bio/work/cv), que es justo donde SÍ debía verse.
+ *      Moviéndolo adentro, después del propio fondo de este wrapper pero
+ *      antes que {children}, pinta arriba de la textura y abajo del
+ *      contenido real — cualquier sección con fondo opaco que venga después
+ *      (las cards del work, por ejemplo) lo sigue tapando, como corresponde.
  *
- * overflow-clip acá es necesario, no cosmético: BordeOrnamental traslada
- * (translateY, ligado al scroll) una tira position:absolute inset-y-0 a
- * esta misma caja. Aunque esa tira recorta su propio contenido con
- * overflow-hidden, el navegador de todos modos suma la posición ya
+ * overflow-clip en el contenedor raíz es necesario, no cosmético:
+ * BordeOrnamental traslada (translateY, ligado al scroll) una tira
+ * position:absolute inset-y-0. Aunque esa tira recorta su propio contenido
+ * con overflow-hidden, el navegador de todos modos suma la posición ya
  * trasladada de la tira al scrollable-overflow de sus ancestros en cuanto
  * ninguno de ellos recorta — y ni <body> ni <main> lo hacen. Sin este
  * overflow-clip, cada pixel de scroll agrega ~0.5px de alto fantasma al
@@ -37,7 +53,6 @@ import BordeOrnamental from './BordeOrnamental';
 export default function PaperSurface({ children }: { children: ReactNode }) {
   return (
     <div className="relative z-10 overflow-clip">
-      <BordeOrnamental />
       <OlaPapel />
       <div
         className="relative bg-papel"
@@ -47,6 +62,7 @@ export default function PaperSurface({ children }: { children: ReactNode }) {
           backgroundRepeat: 'repeat-y',
         }}
       >
+        <BordeOrnamental />
         {children}
       </div>
     </div>

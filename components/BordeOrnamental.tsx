@@ -85,7 +85,22 @@ export default function BordeOrnamental() {
       end: 'bottom bottom',
       scrub: true,
       onUpdate: (self) => {
-        gsap.set(targets, { y: self.scroll() * 0.5 });
+        // self.scroll() es el scroll de TODO el documento, incluido lo que
+        // se scrollea mientras el hero todavía tapa esta sección — para
+        // cuando el papel por fin queda a la vista, el borde ya viene
+        // arrastrando un corrimiento de 0.5 * (esa distancia ya scrolleada),
+        // dejando un hueco sin borde arriba de todo justo en el tramo que
+        // más se ve (bio, y buena parte de work). Restamos dónde arranca
+        // el papel en sí (el propio padre, "bg-papel", nunca transformado —
+        // se mide en vivo así queda correcto también tras un reflow, por
+        // ejemplo el del swap de fuente) para que el corrimiento arranque
+        // en 0 exactamente cuando el papel entra en pantalla, y solo crezca
+        // a partir de ahí. Math.max(0, ...) por si acaso el papel todavía
+        // no llegó a la parte de arriba del viewport.
+        const papelTop = targets[0].parentElement
+          ? targets[0].parentElement.getBoundingClientRect().top + window.scrollY
+          : 0;
+        gsap.set(targets, { y: Math.max(0, self.scroll() - papelTop) * 0.5 });
       },
     });
 

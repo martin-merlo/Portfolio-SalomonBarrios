@@ -6,7 +6,9 @@ import styles from './ObraCard.module.css';
 const SPAN: Record<TamanoGrilla, string> = {
   normal: 'col-span-12 md:col-span-4 aspect-square',
   banner: 'col-span-12 aspect-[3/1]',
-  chica: 'col-span-6 md:col-span-3 aspect-[2/1]',
+  // Más apaisado y bajo que antes (era aspect-[2/1] — se veía demasiado
+  // cuadrada/alta contra la referencia de diseño). normal y banner sin tocar.
+  chica: 'col-span-6 md:col-span-3 aspect-[3/1]',
 };
 
 /**
