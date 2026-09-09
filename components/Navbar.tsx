@@ -35,6 +35,7 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
   useEffect(() => {
     const heroTitleEl = document.getElementById('hero-title');
     const heroSub = document.getElementById('hero-sub');
+    const heroDecl = document.getElementById('hero-declaracion');
     const navSlotEl = navSlotRef.current;
     const navBgEl = navBgRef.current;
     if (!heroTitleEl || !navSlotEl || !navBgEl) return;
@@ -58,6 +59,7 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
       gsap.set(navSlot, { clearProps: 'opacity' });
       gsap.set(navBg, { clearProps: 'opacity' });
       if (heroSub) gsap.set(heroSub, { clearProps: 'all' });
+      if (heroDecl) gsap.set(heroDecl, { clearProps: 'all' });
 
       // Distancia real de scroll que tarda PaperSurface (z-10, en flujo
       // normal) en cubrir por completo al hero (sticky, h-screen, z-0):
@@ -98,6 +100,7 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
         );
         tl.to(navBg, { opacity: NAVBG_MAX_OPACITY, ease: 'none' }, 0);
         if (heroSub) tl.to(heroSub, { opacity: 0, ease: 'none' }, 0);
+        if (heroDecl) tl.to(heroDecl, { opacity: 0, ease: 'none' }, 0);
         st = tl.scrollTrigger;
         return;
       }
@@ -145,6 +148,10 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
         0,
       ).to(navBg, { opacity: NAVBG_MAX_OPACITY, ease: 'none', duration: 1 }, 0);
       if (heroSub) tl.to(heroSub, { opacity: 0, y: -10, ease: 'none', duration: 1 }, 0);
+      // Mismo tween que #hero-sub: el bloque de la declaración (título + texto)
+      // se funde parejo con el subtítulo del nombre. Misma curva (ease:'none'),
+      // mismo timing (posición 0, duration 1) y mismo y:-10 de deriva.
+      if (heroDecl) tl.to(heroDecl, { opacity: 0, y: -10, ease: 'none', duration: 1 }, 0);
       // Cruce de las dos copias del título ("que vuela" vs. la fija del
       // navbar). OJO antes de tocar esto: las dos curvas de opacidad se
       // superponen A PROPÓSITO — es la solución a un bug de hace varias

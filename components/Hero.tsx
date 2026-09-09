@@ -29,15 +29,19 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
           recta hacia arriba en vez de diagonal hacia arriba-izquierda como
           en diseño.pdf. (Antes lg:pl-24/xl:pl-32 — muy poco diagonal — se
           dobló a lg:pl-48/xl:pl-64 — diagonal muy marcada pero título
-          quedaba centrado — y ahora se recortó a lg:pl-36/xl:pl-48 para que
-          el título arranque un poco más a la izquierda sin perder tanta
-          diagonal.) Sigue siendo solo un mayor punto de partida — el deltaX
+          quedaba centrado — luego se recortó a lg:pl-36/xl:pl-48, y ahora a
+          lg:pl-32/xl:pl-44 para arrancar un paso más a la izquierda. Medido a
+          1280x800 el ratio |deltaX|/|deltaY| del anclaje pasa de ~0.69 a
+          ~0.63 en xl y de ~0.52 a ~0.47 en lg: la diagonal sigue claramente
+          marcada. Un paso más — lg:pl-28/xl:pl-40 — la aplanaría a ~0.41/~0.58
+          y no vale la pena; este es el punto razonable más a la izquierda.)
+          Sigue siendo solo un mayor punto de partida — el deltaX
           real lo sigue midiendo Navbar en vivo, así que el aterrizaje sigue
           coincidiendo exacto con el slot del navbar sin importar este
           valor. Este inset solo se nota en desktop (lg:+): mobile usa
           crossfade en vez de mover el título, así que no lo necesita.
         */}
-        <div className="lg:pl-36 xl:pl-48">
+        <div className="lg:pl-32 xl:pl-44">
           {/*
             text-[12vw] en vez de 15vw: medido en vivo, "SALOMÓN BARRIOS" con
             15vw se salía del viewport por ~45px en 360/390px (el hero recorta
@@ -66,8 +70,11 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
         {/* Alineado a la izquierda (pedido del artista, diseño original) y
             agrandado — antes text-sm/base y text-xs/sm, quedaba chico.
             md:mr-*: corrido un poco del borde derecho (referencia de diseño
-            original, centro-derecha en vez de pegado al borde). */}
-        <div className="max-w-sm md:mt-2 md:mr-6 lg:mr-14 xl:mr-20">
+            original, centro-derecha en vez de pegado al borde).
+            id="hero-declaracion": el Navbar lo desvanece con el scroll con el
+            MISMO tween que al subtítulo del nombre (#hero-sub), para que el
+            bloque completo (título + texto) se funda parejo con él. */}
+        <div id="hero-declaracion" className="max-w-sm md:mt-2 md:mr-6 lg:mr-14 xl:mr-20">
           <h2 className="font-mono uppercase tracking-wide text-claro text-base sm:text-lg lg:text-xl mb-3">
             {contenido.declaracionTitulo}
           </h2>
