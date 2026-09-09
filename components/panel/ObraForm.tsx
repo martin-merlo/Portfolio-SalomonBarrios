@@ -12,7 +12,7 @@ import ObraGaleria from './ObraGaleria';
 const OPCIONES_TAMANO: { valor: TamanoGrilla; etiqueta: string; forma: string }[] = [
   { valor: 'normal', etiqueta: 'Normal', forma: 'aspect-square w-10' },
   { valor: 'banner', etiqueta: 'Banner', forma: 'aspect-[3/1] w-16' },
-  { valor: 'chica', etiqueta: 'Chica', forma: 'aspect-[2/1] w-10' },
+  { valor: 'chica', etiqueta: 'Chica', forma: 'aspect-[4/1] w-16' },
 ];
 
 async function generarSlugUnico(
@@ -306,7 +306,10 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
           Contenido extendido (opcional, página individual)
         </h2>
-        <Campo label="Subtítulo extendido">
+        <Campo
+          label="Subtítulo extendido"
+          ayuda="Subtítulo que aparece en la página individual de la obra (/obra/[slug]), justo debajo del hero."
+        >
           <input
             type="text"
             value={subtituloExtendido}
@@ -314,7 +317,10 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
             className="input"
           />
         </Campo>
-        <Campo label="Texto extendido">
+        <Campo
+          label="Texto extendido"
+          ayuda="Texto largo de la página individual de la obra. Separá párrafos con una línea en blanco (Enter dos veces)."
+        >
           <textarea
             value={textoExtendido}
             onChange={(e) => setTextoExtendido(e.target.value)}

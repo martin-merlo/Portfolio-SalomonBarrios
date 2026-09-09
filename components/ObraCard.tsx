@@ -6,9 +6,12 @@ import styles from './ObraCard.module.css';
 const SPAN: Record<TamanoGrilla, string> = {
   normal: 'col-span-12 md:col-span-4 aspect-square',
   banner: 'col-span-12 aspect-[3/1]',
-  // Más apaisado y bajo que antes (era aspect-[2/1] — se veía demasiado
-  // cuadrada/alta contra la referencia de diseño). normal y banner sin tocar.
-  chica: 'col-span-6 md:col-span-3 aspect-[3/1]',
+  // Chica: mobile-first, 2 por fila hasta tablet (col-span-6) y 4 por fila en
+  // desktop (lg:col-span-3 = 3/12). Más apaisada/finita que antes: 4/1 en
+  // desktop; en mobile/tablet la card es más angosta, así que un 4/1 quedaría
+  // ilegible → usamos 5/2 (más alta) para que el título siga entrando.
+  // normal y banner sin tocar.
+  chica: 'col-span-6 lg:col-span-3 aspect-[5/2] lg:aspect-[4/1]',
 };
 
 /**

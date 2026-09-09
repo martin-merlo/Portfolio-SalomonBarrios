@@ -5,7 +5,7 @@ import NavbarObra from '@/components/NavbarObra';
 import ObraHero from '@/components/ObraHero';
 import PaperSurface from '@/components/PaperSurface';
 import SectionLabel from '@/components/SectionLabel';
-import { fondoImagen } from '@/lib/imagen';
+import CarruselObra from '@/components/CarruselObra';
 
 // El artista va a estar editando obras desde el panel más adelante — no hace
 // falta que el contenido sea instantáneo, así que revalidamos cada 60s.
@@ -54,17 +54,7 @@ export default async function ObraPage({ params }: Params) {
                   </div>
                 )}
 
-                {obra.imagenes.length > 0 && (
-                  <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-2">
-                    {obra.imagenes.map((imagen) => (
-                      <div
-                        key={imagen.id}
-                        className="relative shrink-0 w-64 sm:w-80 aspect-[4/3] bg-cover bg-center rounded-sm"
-                        style={{ backgroundImage: fondoImagen(imagen.imagenUrl) }}
-                      />
-                    ))}
-                  </div>
-                )}
+                {obra.imagenes.length > 0 && <CarruselObra imagenes={obra.imagenes} />}
               </div>
             </section>
           </PaperSurface>

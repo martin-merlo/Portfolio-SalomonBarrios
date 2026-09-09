@@ -35,6 +35,7 @@ export default function ObraGaleria({ obraId, imagenesIniciales, onCambiar }: Ob
   }
 
   async function eliminar(imagen: ObraImagen) {
+    if (!window.confirm('¿Eliminar esta imagen de la galería?')) return;
     const supabase = createClient();
     const { error } = await supabase.from('obra_imagenes').delete().eq('id', imagen.id);
     if (!error) {
