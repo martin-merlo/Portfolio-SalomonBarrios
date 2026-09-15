@@ -3,7 +3,7 @@ import SectionLabel from './SectionLabel';
 
 function IconoInstagram() {
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.5" />
       <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5" />
       <circle cx="17.2" cy="6.8" r="0.9" fill="currentColor" />
@@ -13,7 +13,7 @@ function IconoInstagram() {
 
 function IconoTikTok() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="52" height="52" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M14 3v10.8a3.1 3.1 0 1 1-2.2-2.97"
         stroke="currentColor"
@@ -50,7 +50,7 @@ export default function Contacto({ contenido }: { contenido: ContenidoSitio }) {
             {contenido.contactoEmail}
           </a>
 
-          <div className="flex gap-6 mt-2 text-tinta">
+          <div className="flex items-center gap-8 sm:gap-10 mt-2 text-tinta">
             <a
               href={contenido.instagramUrl}
               target="_blank"

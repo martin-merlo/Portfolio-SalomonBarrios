@@ -20,10 +20,15 @@ function Card({ item }: { item: ImagenProceso }) {
 }
 
 /**
- * Carrusel en loop continuo. Sin prefers-reduced-motion: tira duplicada +
- * tween GSAP en xPercent de 0 a -50% (loop sin costuras), pausable con el
- * mouse encima y arrastrable con pointer events. Con reduced-motion: tira
+ * Carrusel en loop continuo (auto-play). Sin prefers-reduced-motion: tira
+ * duplicada + tween GSAP en xPercent de 0 a -50% (loop sin costuras), que se
+ * recorre solo y se pausa con el mouse encima. Con reduced-motion: tira
  * simple, sin duplicar, con scroll horizontal nativo (sin loop ni auto-play).
+ *
+ * El arrastre manual (drag con pointer events) se quitó a pedido del cliente:
+ * no funcionaba bien y la navegación queda cubierta por el auto-play + la
+ * pausa al hover. (El carrusel de las páginas de obra es otro componente,
+ * CarruselObra, con sus flechas — este cambio no lo toca.)
  */
 export default function Proceso({ items }: { items: ImagenProceso[] }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -47,41 +52,8 @@ export default function Proceso({ items }: { items: ImagenProceso[] }) {
     });
     tweenRef.current = tween;
 
-    let dragging = false;
-    let startX = 0;
-    let startXPercent = 0;
-
-    function onPointerDown(e: PointerEvent) {
-      dragging = true;
-      tween.pause();
-      startX = e.clientX;
-      startXPercent = gsap.getProperty(track, 'xPercent') as number;
-      track!.setPointerCapture(e.pointerId);
-    }
-    function onPointerMove(e: PointerEvent) {
-      if (!dragging) return;
-      const dx = e.clientX - startX;
-      const trackWidth = track!.scrollWidth / 2;
-      const deltaPercent = (dx / trackWidth) * 100;
-      gsap.set(track, { xPercent: startXPercent + deltaPercent });
-    }
-    function onPointerUp() {
-      if (!dragging) return;
-      dragging = false;
-      tween.play();
-    }
-
-    track.addEventListener('pointerdown', onPointerDown);
-    track.addEventListener('pointermove', onPointerMove);
-    track.addEventListener('pointerup', onPointerUp);
-    track.addEventListener('pointercancel', onPointerUp);
-
     return () => {
       tween.kill();
-      track.removeEventListener('pointerdown', onPointerDown);
-      track.removeEventListener('pointermove', onPointerMove);
-      track.removeEventListener('pointerup', onPointerUp);
-      track.removeEventListener('pointercancel', onPointerUp);
     };
   }, [loopHabilitado, items.length]);
 
@@ -109,7 +81,7 @@ export default function Proceso({ items }: { items: ImagenProceso[] }) {
   return (
     <section aria-label="Proceso de trabajo" className="overflow-hidden py-10 sm:py-16">
       <div className="overflow-hidden" onMouseEnter={pausar} onMouseLeave={reanudar}>
-        <div ref={trackRef} className="flex w-max cursor-grab active:cursor-grabbing touch-pan-y">
+        <div ref={trackRef} className="flex w-max">
           {doble.map((item, i) => (
             <Card key={`${item.id}-${i}`} item={item} />
           ))}

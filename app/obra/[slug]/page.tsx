@@ -30,35 +30,39 @@ export default async function ObraPage({ params }: Params) {
 
   if (!obra) notFound();
 
-  const tieneContenidoExtra = Boolean(
-    obra.subtituloExtendido || obra.textoExtendido || obra.imagenes.length > 0,
-  );
-
   return (
     <>
       <NavbarObra nombreArtista={contenido.heroTitulo} />
       <main>
         <ObraHero titulo={obra.titulo} imagenUrl={obra.imagenUrl} descripcion={obra.descripcion} />
 
-        {tieneContenidoExtra && (
-          <PaperSurface>
-            <section className="px-5 sm:px-10 lg:px-14 pt-20 sm:pt-28 pb-20 sm:pb-28">
-              <div className="max-w-[1500px] mx-auto">
-                {obra.subtituloExtendido && <SectionLabel texto={obra.subtituloExtendido} />}
+        {/*
+          PaperSurface se renderiza SIEMPRE (antes solo si había contenido
+          extendido) para que la subpágina tenga el mismo marco que el home:
+          textura de papel + borde ornamental, que viven dentro de este
+          componente compartido. min-h asegura que el papel sea lo bastante
+          alto como para que el borde y la textura se lean como marco (y para
+          que el papel suba sobre el hero al scrollear) incluso cuando la obra
+          todavía no tiene subtítulo/texto/galería cargados. El contenido
+          extendido sigue siendo condicional — no se inventan secciones.
+        */}
+        <PaperSurface>
+          <section className="px-5 sm:px-10 lg:px-14 pt-20 sm:pt-28 pb-20 sm:pb-28 min-h-[70vh]">
+            <div className="max-w-[1500px] mx-auto">
+              {obra.subtituloExtendido && <SectionLabel texto={obra.subtituloExtendido} />}
 
-                {obra.textoExtendido && (
-                  <div className="font-cuerpo text-tinta text-sm sm:text-base leading-relaxed space-y-4 mb-12">
-                    {obra.textoExtendido.split('\n\n').map((parrafo, i) => (
-                      <p key={i}>{parrafo}</p>
-                    ))}
-                  </div>
-                )}
+              {obra.textoExtendido && (
+                <div className="font-cuerpo text-tinta text-sm sm:text-base leading-relaxed space-y-4 mb-12">
+                  {obra.textoExtendido.split('\n\n').map((parrafo, i) => (
+                    <p key={i}>{parrafo}</p>
+                  ))}
+                </div>
+              )}
 
-                {obra.imagenes.length > 0 && <CarruselObra imagenes={obra.imagenes} />}
-              </div>
-            </section>
-          </PaperSurface>
-        )}
+              {obra.imagenes.length > 0 && <CarruselObra imagenes={obra.imagenes} />}
+            </div>
+          </section>
+        </PaperSurface>
       </main>
     </>
   );
