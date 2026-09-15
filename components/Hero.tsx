@@ -1,5 +1,5 @@
 import type { ContenidoSitio } from '@/lib/tipos';
-import { fondoImagen } from '@/lib/imagen';
+import { fondoImagen, heroMaskStyle } from '@/lib/imagen';
 
 export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
   return (
@@ -11,6 +11,8 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
         backgroundImage: fondoImagen(contenido.heroImagenUrl),
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        // Borde inferior ondulado desde el estado inicial (ver heroMaskStyle).
+        ...heroMaskStyle,
       }}
     >
       {/* Velo oscuro azulado */}
