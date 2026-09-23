@@ -1,4 +1,4 @@
-import { fondoImagen, heroMaskStyle } from '@/lib/imagen';
+import { fondoImagen } from '@/lib/imagen';
 
 /**
  * Hero de /obra/[slug] — mismo tratamiento visual que el Hero del home
@@ -26,8 +26,6 @@ export default function ObraHero({
         backgroundImage: fondoImagen(imagenUrl),
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        // Borde inferior ondulado desde el estado inicial (ver heroMaskStyle).
-        ...heroMaskStyle,
       }}
     >
       <div className="absolute inset-0 bg-tinta/45" aria-hidden="true" />

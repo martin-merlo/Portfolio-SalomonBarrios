@@ -52,7 +52,17 @@ import BordeOrnamental from './BordeOrnamental';
  */
 export default function PaperSurface({ children }: { children: ReactNode }) {
   return (
-    <div className="relative z-10 overflow-clip">
+    <div
+      className="relative z-10 overflow-clip"
+      // El papel arranca solapando el pie del hero para que su ola REAL (la de
+      // OlaPapel, con su textura) asome en reposo en vez de quedar por debajo
+      // del fold — es la misma ola que después sube a tapar el hero, idéntica
+      // en reposo y en scroll. El valle de la ola de OlaPapel cae a 251/1281 =
+      // 19.6% del ancho por debajo del tope del papel; con este margen negativo
+      // ese valle queda justo en el borde inferior del hero (asoma ~100px). Es
+      // % del ancho (no px) para escalar con el ancho igual que la ola.
+      style={{ marginTop: '-19.6%' }}
+    >
       <OlaPapel />
       <div
         className="relative bg-papel"
