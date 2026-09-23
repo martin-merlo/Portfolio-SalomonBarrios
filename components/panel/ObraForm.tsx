@@ -8,6 +8,7 @@ import type { ObraConDetalle, ObraImagen, TamanoGrilla } from '@/lib/tipos';
 import SubidaImagen from './SubidaImagen';
 import Toggle from './Toggle';
 import ObraGaleria from './ObraGaleria';
+import ObraBloques from './ObraBloques';
 
 const OPCIONES_TAMANO: { valor: TamanoGrilla; etiqueta: string; forma: string }[] = [
   { valor: 'normal', etiqueta: 'Normal', forma: 'aspect-square w-10' },
@@ -340,6 +341,27 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
           </p>
         ) : (
           <ObraGaleria obraId={obraInicial.id} imagenesIniciales={imagenes} onCambiar={setImagenes} />
+        )}
+      </section>
+
+      {/* Constructor de bloques (Parte 1): convive con los campos viejos de
+          arriba. Cada bloque se persiste al toque en obra_bloques, no con el
+          botón "Guardar" del form — por eso sólo aparece en modo editar (necesita
+          la obra ya creada). El front todavía NO lo renderiza (eso es la Parte 2). */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
+          Contenido en bloques
+        </h2>
+        <p className="text-xs text-slate-500">
+          Bloques flexibles (texto, imagen o video) que se ordenan por drag &amp; drop. Por ahora
+          conviven con el contenido extendido de arriba; el front todavía muestra los campos viejos.
+        </p>
+        {modo === 'crear' || !obraInicial ? (
+          <p className="text-sm text-slate-500">
+            Podés agregar bloques después de guardar la obra por primera vez.
+          </p>
+        ) : (
+          <ObraBloques obraId={obraInicial.id} />
         )}
       </section>
 

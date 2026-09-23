@@ -1,4 +1,4 @@
-import type { ContenidoSitio, ImagenProceso, Obra, ObraImagen } from './tipos';
+import type { Bloque, ContenidoSitio, ImagenProceso, Obra, ObraImagen } from './tipos';
 
 /**
  * Filas crudas de Supabase (snake_case) y su mapeo a los tipos camelCase que
@@ -38,6 +38,17 @@ export type ProcesoRow = {
   orden: number;
 };
 
+export type BloqueRow = {
+  id: string;
+  obra_id: string;
+  tipo: Bloque['tipo'];
+  orden: number;
+  contenido: string | null;
+  imagen_url: string | null;
+  tamano: Bloque['tamano'];
+  video_url: string | null;
+};
+
 export function mapObra(row: ObraRow): Obra {
   return {
     id: row.id,
@@ -73,6 +84,19 @@ export function mapProceso(row: ProcesoRow): ImagenProceso {
     imagenUrl: row.imagen_url,
     textoCorto: row.texto_corto,
     orden: row.orden,
+  };
+}
+
+export function mapBloque(row: BloqueRow): Bloque {
+  return {
+    id: row.id,
+    obraId: row.obra_id,
+    tipo: row.tipo,
+    orden: row.orden,
+    contenido: row.contenido,
+    imagenUrl: row.imagen_url,
+    tamano: row.tamano,
+    videoUrl: row.video_url,
   };
 }
 

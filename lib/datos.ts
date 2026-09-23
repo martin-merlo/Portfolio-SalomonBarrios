@@ -1,7 +1,7 @@
 import { createPublicClient } from './supabase/publico';
-import { CLAVES_CONTENIDO, mapObra, mapObraImagen, mapProceso } from './mapeo';
-import type { ContenidoSitio, ImagenProceso, Obra, ObraConDetalle } from './tipos';
-import type { ObraImagenRow, ObraRow, ProcesoRow } from './mapeo';
+import { CLAVES_CONTENIDO, mapBloque, mapObra, mapObraImagen, mapProceso } from './mapeo';
+import type { Bloque, ContenidoSitio, ImagenProceso, Obra, ObraConDetalle } from './tipos';
+import type { BloqueRow, ObraImagenRow, ObraRow, ProcesoRow } from './mapeo';
 
 export async function getObras(): Promise<Obra[]> {
   const supabase = createPublicClient();
@@ -47,6 +47,28 @@ export async function getObraBySlug(slug: string): Promise<ObraConDetalle | null
     ...mapObra(obraRow as ObraRow),
     imagenes: ((imagenesRows as ObraImagenRow[]) ?? []).map(mapObraImagen),
   };
+}
+
+/**
+ * Bloques de contenido flexible de una obra (obra_bloques), ordenados.
+ * Todavía no lo consume el front — el renderizado de /obra/[slug] sigue usando
+ * subtitulo_extendido / texto_extendido / obra_imagenes. Queda listo para la
+ * Parte 2, cuando el front pase a renderizar bloques.
+ */
+export async function getBloquesDeObra(obraId: string): Promise<Bloque[]> {
+  const supabase = createPublicClient();
+  const { data, error } = await supabase
+    .from('obra_bloques')
+    .select('*')
+    .eq('obra_id', obraId)
+    .order('orden', { ascending: true });
+
+  if (error) {
+    console.error('Error al cargar bloques desde Supabase:', error.message);
+    return [];
+  }
+
+  return (data as BloqueRow[]).map(mapBloque);
 }
 
 export async function getProceso(): Promise<ImagenProceso[]> {
