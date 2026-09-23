@@ -15,26 +15,20 @@ export interface Obra {
   orden: number;
   tienePaginaPropia: boolean;
   publicada: boolean;
+  // Subtítulo de la página individual (encabezado de la sección de contenido
+  // extendido, arriba de los bloques). Se queda como campo fijo.
   subtituloExtendido: string | null;
-  textoExtendido: string | null;
-}
-
-/** Fila de la galería secundaria de imágenes de una obra (obra_imagenes). */
-export interface ObraImagen {
-  id: string;
-  imagenUrl: string;
-  orden: number;
 }
 
 export type TipoBloque = 'texto' | 'imagen' | 'video';
 export type TamanoBloque = 'chica' | 'mediana' | 'banner';
 
 /**
- * Bloque de contenido flexible de una página de obra (tabla obra_bloques).
- * Convive por ahora con subtitulo_extendido / texto_extendido / obra_imagenes;
- * el front recién los usa en la Parte 2. Según el tipo se llenan campos
- * distintos: texto → contenido; imagen → imagenUrl + tamano; video → videoUrl.
- * Los campos no usados por un tipo quedan null.
+ * Bloque de contenido flexible de una página de obra (tabla obra_bloques). Es
+ * el contenido libre debajo del subtítulo: reemplazó a texto_extendido y a la
+ * galería obra_imagenes (retirados). Según el tipo se llenan campos distintos:
+ * texto → contenido; imagen → imagenUrl + tamano; video → videoUrl. Los campos
+ * no usados por un tipo quedan null.
  */
 export interface Bloque {
   id: string;
@@ -45,11 +39,6 @@ export interface Bloque {
   imagenUrl: string | null;
   tamano: TamanoBloque | null;
   videoUrl: string | null;
-}
-
-/** Lo que devuelve getObraBySlug: la obra más sus imágenes relacionadas. */
-export interface ObraConDetalle extends Obra {
-  imagenes: ObraImagen[];
 }
 
 export interface ImagenProceso {

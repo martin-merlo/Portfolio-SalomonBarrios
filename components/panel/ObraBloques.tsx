@@ -59,10 +59,10 @@ function thumbnailYouTube(url: string): string | null {
 }
 
 /**
- * Editor de "Contenido en bloques" (tabla obra_bloques). Igual espíritu que
- * ObraGaleria: sólo en modo editar (necesita obra_id) y cada acción se persiste
- * al toque, no con el botón "Guardar" del form. Carga sus propios bloques al
- * montar. Convive con los campos viejos (subtitulo/texto/galería) — Parte 1.
+ * Editor de "Contenido en bloques" (tabla obra_bloques). Sólo en modo editar
+ * (necesita obra_id) y cada acción se persiste al toque, no con el botón
+ * "Guardar" del form. Carga sus propios bloques al montar. Es el contenido de la
+ * página individual, debajo del subtítulo.
  */
 export default function ObraBloques({ obraId }: { obraId: string }) {
   const [bloques, setBloques] = useState<Bloque[]>([]);

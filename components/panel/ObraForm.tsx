@@ -4,10 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { slugify } from '@/lib/util/slug';
-import type { ObraConDetalle, ObraImagen, TamanoGrilla } from '@/lib/tipos';
+import type { Obra, TamanoGrilla } from '@/lib/tipos';
 import SubidaImagen from './SubidaImagen';
 import Toggle from './Toggle';
-import ObraGaleria from './ObraGaleria';
 import ObraBloques from './ObraBloques';
 
 const OPCIONES_TAMANO: { valor: TamanoGrilla; etiqueta: string; forma: string }[] = [
@@ -31,7 +30,7 @@ async function generarSlugUnico(
 
 interface ObraFormProps {
   modo: 'crear' | 'editar';
-  obraInicial?: ObraConDetalle;
+  obraInicial?: Obra;
 }
 
 export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
@@ -53,8 +52,6 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
   const [slug, setSlug] = useState(obraInicial?.slug ?? '');
   const [slugTocado, setSlugTocado] = useState(modo === 'editar');
   const [subtituloExtendido, setSubtituloExtendido] = useState(obraInicial?.subtituloExtendido ?? '');
-  const [textoExtendido, setTextoExtendido] = useState(obraInicial?.textoExtendido ?? '');
-  const [imagenes, setImagenes] = useState<ObraImagen[]>(obraInicial?.imagenes ?? []);
 
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -99,7 +96,6 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
       publicada,
       tiene_pagina_propia: tienePaginaPropia,
       subtitulo_extendido: subtituloExtendido.trim() || null,
-      texto_extendido: textoExtendido.trim() || null,
     };
 
     if (modo === 'crear') {
@@ -305,11 +301,11 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
 
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-          Contenido extendido (opcional, página individual)
+          Página individual
         </h2>
         <Campo
           label="Subtítulo extendido"
-          ayuda="Subtítulo que aparece en la página individual de la obra (/obra/[slug]), justo debajo del hero."
+          ayuda="Encabezado de la sección de contenido de la página individual (/obra/[slug]), arriba de los bloques. El contenido en sí se arma con los bloques de abajo."
         >
           <input
             type="text"
@@ -318,43 +314,19 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
             className="input"
           />
         </Campo>
-        <Campo
-          label="Texto extendido"
-          ayuda="Texto largo de la página individual de la obra. Separá párrafos con una línea en blanco (Enter dos veces)."
-        >
-          <textarea
-            value={textoExtendido}
-            onChange={(e) => setTextoExtendido(e.target.value)}
-            rows={5}
-            className="input"
-          />
-        </Campo>
       </section>
 
-      <section className="space-y-3">
-        <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
-          Galería adicional
-        </h2>
-        {modo === 'crear' || !obraInicial ? (
-          <p className="text-sm text-slate-500">
-            Podés agregar imágenes a la galería adicional después de guardar la obra por primera vez.
-          </p>
-        ) : (
-          <ObraGaleria obraId={obraInicial.id} imagenesIniciales={imagenes} onCambiar={setImagenes} />
-        )}
-      </section>
-
-      {/* Constructor de bloques (Parte 1): convive con los campos viejos de
-          arriba. Cada bloque se persiste al toque en obra_bloques, no con el
-          botón "Guardar" del form — por eso sólo aparece en modo editar (necesita
-          la obra ya creada). El front todavía NO lo renderiza (eso es la Parte 2). */}
+      {/* Contenido libre de la página individual. Reemplazó a "Texto extendido"
+          y a la "Galería adicional" (obra_imagenes), ya retirados. Cada bloque se
+          persiste al toque en obra_bloques, no con el botón "Guardar" del form —
+          por eso sólo aparece en modo editar (necesita la obra ya creada). */}
       <section className="space-y-3">
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
           Contenido en bloques
         </h2>
         <p className="text-xs text-slate-500">
-          Bloques flexibles (texto, imagen o video) que se ordenan por drag &amp; drop. Por ahora
-          conviven con el contenido extendido de arriba; el front todavía muestra los campos viejos.
+          Bloques flexibles (texto, imagen o video) que se ordenan por drag &amp; drop. Es el
+          contenido de la página individual, debajo del subtítulo.
         </p>
         {modo === 'crear' || !obraInicial ? (
           <p className="text-sm text-slate-500">

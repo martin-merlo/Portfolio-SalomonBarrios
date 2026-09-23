@@ -236,7 +236,6 @@ async function main() {
         tiene_pagina_propia: true,
         publicada: true,
         subtitulo_extendido: null,
-        texto_extendido: null,
       });
       if (insertError) {
         console.error(`  Error insertando fila de "${titulo}":`, insertError.message);

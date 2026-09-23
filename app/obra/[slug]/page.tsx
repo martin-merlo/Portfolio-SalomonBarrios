@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getContenido, getObraBySlug } from '@/lib/datos';
+import { getBloquesDeObra, getContenido, getObraBySlug } from '@/lib/datos';
 import NavbarObra from '@/components/NavbarObra';
 import ObraHero from '@/components/ObraHero';
 import PaperSurface from '@/components/PaperSurface';
 import SectionLabel from '@/components/SectionLabel';
-import CarruselObra from '@/components/CarruselObra';
+import BloquesObra from '@/components/BloquesObra';
 
 // El artista va a estar editando obras desde el panel más adelante — no hace
 // falta que el contenido sea instantáneo, así que revalidamos cada 60s.
@@ -30,6 +30,12 @@ export default async function ObraPage({ params }: Params) {
 
   if (!obra) notFound();
 
+  const bloques = await getBloquesDeObra(obra.id);
+
+  // Sección de contenido extendido = subtítulo (encabezado) + bloques. Si no hay
+  // ni subtítulo ni bloques, la página termina en el hero, sin dejar un vacío.
+  const tieneContenidoExtra = Boolean(obra.subtituloExtendido) || bloques.length > 0;
+
   return (
     <>
       <NavbarObra nombreArtista={contenido.heroTitulo} />
@@ -37,32 +43,22 @@ export default async function ObraPage({ params }: Params) {
         <ObraHero titulo={obra.titulo} imagenUrl={obra.imagenUrl} descripcion={obra.descripcion} />
 
         {/*
-          PaperSurface se renderiza SIEMPRE (antes solo si había contenido
-          extendido) para que la subpágina tenga el mismo marco que el home:
-          textura de papel + borde ornamental, que viven dentro de este
-          componente compartido. min-h asegura que el papel sea lo bastante
-          alto como para que el borde y la textura se lean como marco (y para
-          que el papel suba sobre el hero al scrollear) incluso cuando la obra
-          todavía no tiene subtítulo/texto/galería cargados. El contenido
-          extendido sigue siendo condicional — no se inventan secciones.
+          PaperSurface sólo cuando hay contenido extendido, para que la subpágina
+          tenga el marco del sitio (textura + borde ornamental) donde hay algo que
+          mostrar. min-h asegura que el papel sea lo bastante alto como para subir
+          sobre el hero al scrollear. El contenido libre son los bloques; arriba
+          va el subtítulo como encabezado.
         */}
-        <PaperSurface>
-          <section className="px-5 sm:px-10 lg:px-14 pt-20 sm:pt-28 pb-20 sm:pb-28 min-h-[70vh]">
-            <div className="max-w-[1500px] mx-auto">
-              {obra.subtituloExtendido && <SectionLabel texto={obra.subtituloExtendido} />}
-
-              {obra.textoExtendido && (
-                <div className="font-cuerpo text-tinta text-sm sm:text-base leading-relaxed space-y-4 mb-12">
-                  {obra.textoExtendido.split('\n\n').map((parrafo, i) => (
-                    <p key={i}>{parrafo}</p>
-                  ))}
-                </div>
-              )}
-
-              {obra.imagenes.length > 0 && <CarruselObra imagenes={obra.imagenes} />}
-            </div>
-          </section>
-        </PaperSurface>
+        {tieneContenidoExtra && (
+          <PaperSurface>
+            <section className="px-5 sm:px-10 lg:px-14 pt-20 sm:pt-28 pb-20 sm:pb-28 min-h-[70vh]">
+              <div className="max-w-[1500px] mx-auto">
+                {obra.subtituloExtendido && <SectionLabel texto={obra.subtituloExtendido} />}
+                <BloquesObra bloques={bloques} />
+              </div>
+            </section>
+          </PaperSurface>
+        )}
       </main>
     </>
   );

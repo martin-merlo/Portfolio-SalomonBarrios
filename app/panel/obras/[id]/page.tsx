@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
-import { getObraConImagenesPorId } from '@/lib/panel/datos';
+import { getObraPorId } from '@/lib/panel/datos';
 import ObraForm from '@/components/panel/ObraForm';
 
 export default async function EditarObraPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const obra = await getObraConImagenesPorId(id);
+  const obra = await getObraPorId(id);
 
   if (!obra) notFound();
 

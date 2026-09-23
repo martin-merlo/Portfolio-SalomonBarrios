@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
-import { mapObra, mapObraImagen } from '@/lib/mapeo';
-import type { Obra, ObraConDetalle } from '@/lib/tipos';
-import type { ObraImagenRow, ObraRow } from '@/lib/mapeo';
+import { mapObra } from '@/lib/mapeo';
+import type { Obra } from '@/lib/tipos';
+import type { ObraRow } from '@/lib/mapeo';
 
 /**
  * Lecturas del panel: a diferencia de lib/datos.ts (público, anónimo,
@@ -23,20 +23,11 @@ export async function getTodasLasObras(): Promise<Obra[]> {
   return (data as ObraRow[]).map(mapObra);
 }
 
-export async function getObraConImagenesPorId(id: string): Promise<ObraConDetalle | null> {
+export async function getObraPorId(id: string): Promise<Obra | null> {
   const supabase = await createClient();
 
   const { data: obraRow, error } = await supabase.from('obras').select('*').eq('id', id).maybeSingle();
   if (error || !obraRow) return null;
 
-  const { data: imagenesRows } = await supabase
-    .from('obra_imagenes')
-    .select('*')
-    .eq('obra_id', id)
-    .order('orden', { ascending: true });
-
-  return {
-    ...mapObra(obraRow as ObraRow),
-    imagenes: ((imagenesRows as ObraImagenRow[]) ?? []).map(mapObraImagen),
-  };
+  return mapObra(obraRow as ObraRow);
 }

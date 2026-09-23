@@ -27,8 +27,7 @@ function Card({ item }: { item: ImagenProceso }) {
  *
  * El arrastre manual (drag con pointer events) se quitó a pedido del cliente:
  * no funcionaba bien y la navegación queda cubierta por el auto-play + la
- * pausa al hover. (El carrusel de las páginas de obra es otro componente,
- * CarruselObra, con sus flechas — este cambio no lo toca.)
+ * pausa al hover.
  */
 export default function Proceso({ items }: { items: ImagenProceso[] }) {
   const trackRef = useRef<HTMLDivElement>(null);

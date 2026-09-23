@@ -1,4 +1,4 @@
-import type { Bloque, ContenidoSitio, ImagenProceso, Obra, ObraImagen } from './tipos';
+import type { Bloque, ContenidoSitio, ImagenProceso, Obra } from './tipos';
 
 /**
  * Filas crudas de Supabase (snake_case) y su mapeo a los tipos camelCase que
@@ -22,13 +22,9 @@ export type ObraRow = {
   tiene_pagina_propia: boolean;
   publicada: boolean;
   subtitulo_extendido: string | null;
-  texto_extendido: string | null;
-};
-
-export type ObraImagenRow = {
-  id: string;
-  imagen_url: string;
-  orden: number;
+  // texto_extendido y obra_imagenes se retiraron (los reemplazan obra_bloques):
+  // la columna texto_extendido puede seguir en la base sin uso, pero el código
+  // ya no la mapea.
 };
 
 export type ProcesoRow = {
@@ -66,15 +62,6 @@ export function mapObra(row: ObraRow): Obra {
     tienePaginaPropia: row.tiene_pagina_propia,
     publicada: row.publicada,
     subtituloExtendido: row.subtitulo_extendido,
-    textoExtendido: row.texto_extendido,
-  };
-}
-
-export function mapObraImagen(row: ObraImagenRow): ObraImagen {
-  return {
-    id: row.id,
-    imagenUrl: row.imagen_url,
-    orden: row.orden,
   };
 }
 

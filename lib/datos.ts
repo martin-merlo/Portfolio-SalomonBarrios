@@ -1,7 +1,7 @@
 import { createPublicClient } from './supabase/publico';
-import { CLAVES_CONTENIDO, mapBloque, mapObra, mapObraImagen, mapProceso } from './mapeo';
-import type { Bloque, ContenidoSitio, ImagenProceso, Obra, ObraConDetalle } from './tipos';
-import type { BloqueRow, ObraImagenRow, ObraRow, ProcesoRow } from './mapeo';
+import { CLAVES_CONTENIDO, mapBloque, mapObra, mapProceso } from './mapeo';
+import type { Bloque, ContenidoSitio, ImagenProceso, Obra } from './tipos';
+import type { BloqueRow, ObraRow, ProcesoRow } from './mapeo';
 
 export async function getObras(): Promise<Obra[]> {
   const supabase = createPublicClient();
@@ -20,12 +20,12 @@ export async function getObras(): Promise<Obra[]> {
 }
 
 /**
- * Trae una obra publicada por slug junto con sus imágenes relacionadas
- * (obra_imagenes, ordenadas). Devuelve null si no existe o no está
- * publicada, para que la página de arriba dispare un 404 real con
- * notFound().
+ * Trae una obra publicada por slug. Devuelve null si no existe o no está
+ * publicada, para que la página de arriba dispare un 404 real con notFound().
+ * El contenido extendido (subtítulo + bloques) se trae aparte: el subtítulo ya
+ * viene en la obra, y los bloques con getBloquesDeObra.
  */
-export async function getObraBySlug(slug: string): Promise<ObraConDetalle | null> {
+export async function getObraBySlug(slug: string): Promise<Obra | null> {
   const supabase = createPublicClient();
 
   const { data: obraRow, error } = await supabase
@@ -37,23 +37,13 @@ export async function getObraBySlug(slug: string): Promise<ObraConDetalle | null
 
   if (error || !obraRow) return null;
 
-  const { data: imagenesRows } = await supabase
-    .from('obra_imagenes')
-    .select('*')
-    .eq('obra_id', obraRow.id)
-    .order('orden', { ascending: true });
-
-  return {
-    ...mapObra(obraRow as ObraRow),
-    imagenes: ((imagenesRows as ObraImagenRow[]) ?? []).map(mapObraImagen),
-  };
+  return mapObra(obraRow as ObraRow);
 }
 
 /**
- * Bloques de contenido flexible de una obra (obra_bloques), ordenados.
- * Todavía no lo consume el front — el renderizado de /obra/[slug] sigue usando
- * subtitulo_extendido / texto_extendido / obra_imagenes. Queda listo para la
- * Parte 2, cuando el front pase a renderizar bloques.
+ * Bloques de contenido flexible de una obra (obra_bloques), ordenados por
+ * `orden`. Es el contenido libre de la página individual, debajo del subtítulo
+ * (reemplazó a texto_extendido y a la galería obra_imagenes).
  */
 export async function getBloquesDeObra(obraId: string): Promise<Bloque[]> {
   const supabase = createPublicClient();
