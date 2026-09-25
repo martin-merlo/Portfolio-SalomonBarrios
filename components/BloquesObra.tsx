@@ -1,18 +1,20 @@
 import Image from 'next/image';
 import type { Bloque, TamanoBloque } from '@/lib/tipos';
 
-// Ancho por tamaño de bloque, coherente con lo que significan en la grilla:
-// chica = angosta, mediana = intermedia, banner = ancho completo de la columna.
-// Siempre centrado (mx-auto en el contenedor).
+// Ancho por tamaño de imagen, con la misma proporción relativa que la grilla del
+// home: chica = angosta, normal = intermedia, banner = ancho completo de la
+// columna. Los px no son los mismos que en el home (la columna de la página de
+// obra es más angosta), pero la lógica de proporción entre los tres es la misma.
+// Siempre centrado (mx-auto).
 const ANCHO_BLOQUE: Record<TamanoBloque, string> = {
   chica: 'max-w-sm',
-  mediana: 'max-w-2xl',
+  normal: 'max-w-2xl',
   banner: 'max-w-full',
 };
 
 const SIZES_BLOQUE: Record<TamanoBloque, string> = {
   chica: '(max-width: 640px) 100vw, 384px',
-  mediana: '(max-width: 640px) 100vw, 672px',
+  normal: '(max-width: 640px) 100vw, 672px',
   banner: '(max-width: 640px) 100vw, (max-width: 1560px) 92vw, 1400px',
 };
 
@@ -60,13 +62,23 @@ function parseEmbed(url: string): { src: string; vertical: boolean } | null {
   return null;
 }
 
-function BloqueTexto({ contenido }: { contenido: string }) {
-  // Mismo estilo tipográfico que tenía el texto extendido (font mono de cuerpo).
+function BloqueTexto({ titulo, contenido }: { titulo: string | null; contenido: string }) {
+  const parrafos = contenido.trim() ? contenido.split('\n\n') : [];
   return (
-    <div className="font-cuerpo text-tinta text-sm sm:text-base leading-relaxed space-y-4">
-      {contenido.split('\n\n').map((parrafo, i) => (
-        <p key={i}>{parrafo}</p>
-      ))}
+    <div className="space-y-4">
+      {titulo?.trim() && (
+        // Encabezado del bloque: misma tipografía de subtítulo que el resto del
+        // sitio, un escalón por debajo del subtítulo de la sección.
+        <h3 className="font-subtitulo text-tinta text-base sm:text-lg">{titulo}</h3>
+      )}
+      {parrafos.length > 0 && (
+        // Mismo estilo tipográfico que tenía el texto extendido (font mono de cuerpo).
+        <div className="font-cuerpo text-tinta text-sm sm:text-base leading-relaxed space-y-4">
+          {parrafos.map((parrafo, i) => (
+            <p key={i}>{parrafo}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -89,11 +101,14 @@ function BloqueImagen({ url, tamano }: { url: string; tamano: TamanoBloque }) {
   );
 }
 
-function BloqueVideo({ url, tamano }: { url: string; tamano: TamanoBloque }) {
+function BloqueVideo({ url, ancho }: { url: string; ancho: number }) {
   const embed = parseEmbed(url);
   if (!embed) return null;
   return (
-    <div className={`mx-auto ${ANCHO_BLOQUE[tamano]}`}>
+    // Ancho = % de la columna de contenido (control fino sólo para video), y
+    // centrado. Al ser relativo, en mobile sigue siendo proporcional. La
+    // proporción (16:9 normal, 9:16 short) la define parseEmbed.
+    <div className="mx-auto" style={{ width: `${ancho}%` }}>
       <div
         className="relative w-full overflow-hidden rounded-sm bg-tinta"
         style={{ aspectRatio: embed.vertical ? '9 / 16' : '16 / 9' }}
@@ -122,16 +137,20 @@ export default function BloquesObra({ bloques }: { bloques: Bloque[] }) {
   return (
     <div className="space-y-10 sm:space-y-14">
       {bloques.map((b) => {
-        const tamano: TamanoBloque = b.tamano ?? 'mediana';
-
         if (b.tipo === 'texto') {
-          return b.contenido?.trim() ? <BloqueTexto key={b.id} contenido={b.contenido} /> : null;
+          return b.titulo?.trim() || b.contenido?.trim() ? (
+            <BloqueTexto key={b.id} titulo={b.titulo} contenido={b.contenido ?? ''} />
+          ) : null;
         }
         if (b.tipo === 'imagen') {
-          return b.imagenUrl ? <BloqueImagen key={b.id} url={b.imagenUrl} tamano={tamano} /> : null;
+          return b.imagenUrl ? (
+            <BloqueImagen key={b.id} url={b.imagenUrl} tamano={b.tamano ?? 'normal'} />
+          ) : null;
         }
         if (b.tipo === 'video') {
-          return b.videoUrl ? <BloqueVideo key={b.id} url={b.videoUrl} tamano={tamano} /> : null;
+          return b.videoUrl ? (
+            <BloqueVideo key={b.id} url={b.videoUrl} ancho={b.videoAncho ?? 100} />
+          ) : null;
         }
         return null;
       })}

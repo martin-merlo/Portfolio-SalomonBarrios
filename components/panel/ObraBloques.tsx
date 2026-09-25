@@ -8,13 +8,16 @@ import type { Bloque, TamanoBloque, TipoBloque } from '@/lib/tipos';
 import SubidaImagen from './SubidaImagen';
 import ListaOrdenable from './ListaOrdenable';
 
-// Mismos 3 botones visuales que el tamaño de grilla de las obras (ObraForm),
-// pero con los valores de bloque de imagen (chica / mediana / banner).
+// Mismos 3 botones visuales y vocabulario que el tamaño de grilla de las obras
+// del home (chica / normal / banner). Sólo para bloques de imagen.
 const TAMANOS_BLOQUE: { valor: TamanoBloque; etiqueta: string; forma: string }[] = [
   { valor: 'chica', etiqueta: 'Chica', forma: 'aspect-[4/1] w-16' },
-  { valor: 'mediana', etiqueta: 'Mediana', forma: 'aspect-square w-10' },
+  { valor: 'normal', etiqueta: 'Normal', forma: 'aspect-square w-10' },
   { valor: 'banner', etiqueta: 'Banner', forma: 'aspect-[3/1] w-16' },
 ];
+
+// Ancho del video como % de la columna de contenido. Sólo para bloques de video.
+const ANCHOS_VIDEO = [25, 50, 75, 100] as const;
 
 const TIPOS: { valor: TipoBloque; etiqueta: string }[] = [
   { valor: 'texto', etiqueta: '+ Texto' },
@@ -23,7 +26,8 @@ const TIPOS: { valor: TipoBloque; etiqueta: string }[] = [
 ];
 
 // Columnas explícitas para no depender del orden de select('*').
-const COLS = 'id, obra_id, tipo, orden, contenido, imagen_url, tamano, video_url';
+const COLS =
+  'id, obra_id, tipo, orden, contenido, titulo, imagen_url, tamano, video_url, video_ancho';
 
 /** Acepta sólo links de YouTube o Vimeo (con o sin www, youtu.be, player.vimeo.com). */
 function esUrlVideoValida(url: string): boolean {
@@ -110,9 +114,11 @@ export default function ObraBloques({ obraId }: { obraId: string }) {
         tipo,
         orden: bloques.length + 1,
         contenido: null,
+        titulo: null,
         imagen_url: null,
-        tamano: tipo === 'imagen' ? 'mediana' : null,
+        tamano: tipo === 'imagen' ? 'normal' : null,
         video_url: null,
+        video_ancho: tipo === 'video' ? 100 : null,
       })
       .select(COLS)
       .single();
@@ -209,14 +215,24 @@ export default function ObraBloques({ obraId }: { obraId: string }) {
                 </div>
 
                 {b.tipo === 'texto' && (
-                  <textarea
-                    value={b.contenido ?? ''}
-                    onChange={(e) => setCampo(b.id, { contenido: e.target.value })}
-                    onBlur={() => persistir(b.id, { contenido: b.contenido })}
-                    rows={4}
-                    placeholder="Texto del bloque…"
-                    className="w-full rounded border border-slate-300 px-3 py-2 text-sm"
-                  />
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      value={b.titulo ?? ''}
+                      onChange={(e) => setCampo(b.id, { titulo: e.target.value })}
+                      onBlur={() => persistir(b.id, { titulo: (b.titulo ?? '').trim() || null })}
+                      placeholder="Título del bloque (opcional)"
+                      className="w-full rounded border border-slate-300 px-3 py-2 text-sm font-medium"
+                    />
+                    <textarea
+                      value={b.contenido ?? ''}
+                      onChange={(e) => setCampo(b.id, { contenido: e.target.value })}
+                      onBlur={() => persistir(b.id, { contenido: b.contenido })}
+                      rows={4}
+                      placeholder="Texto del bloque…"
+                      className="w-full rounded border border-slate-300 px-3 py-2 text-sm"
+                    />
+                  </div>
                 )}
 
                 {b.tipo === 'imagen' && (
@@ -288,6 +304,29 @@ export default function ObraBloques({ obraId }: { obraId: string }) {
                         </a>
                       </div>
                     ) : null}
+
+                    {/* Ancho del video como % de la columna (reemplaza al selector
+                        de tamaño chica/normal/banner para el caso del video). */}
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <span className="text-xs text-slate-600">Ancho:</span>
+                      {ANCHOS_VIDEO.map((pct) => (
+                        <button
+                          key={pct}
+                          type="button"
+                          onClick={() => {
+                            setCampo(b.id, { videoAncho: pct });
+                            persistir(b.id, { video_ancho: pct });
+                          }}
+                          className={`rounded border-2 px-2.5 py-1 text-xs transition-colors ${
+                            (b.videoAncho ?? 100) === pct
+                              ? 'border-slate-700 bg-slate-100 text-slate-800'
+                              : 'border-slate-200 text-slate-600 hover:border-slate-400'
+                          }`}
+                        >
+                          {pct}%
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

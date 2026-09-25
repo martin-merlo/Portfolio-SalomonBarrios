@@ -40,9 +40,11 @@ export type BloqueRow = {
   tipo: Bloque['tipo'];
   orden: number;
   contenido: string | null;
+  titulo: string | null;
   imagen_url: string | null;
   tamano: Bloque['tamano'];
   video_url: string | null;
+  video_ancho: number | null;
 };
 
 export function mapObra(row: ObraRow): Obra {
@@ -81,9 +83,11 @@ export function mapBloque(row: BloqueRow): Bloque {
     tipo: row.tipo,
     orden: row.orden,
     contenido: row.contenido,
+    titulo: row.titulo,
     imagenUrl: row.imagen_url,
     tamano: row.tamano,
     videoUrl: row.video_url,
+    videoAncho: row.video_ancho,
   };
 }
 

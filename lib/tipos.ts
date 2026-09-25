@@ -21,14 +21,18 @@ export interface Obra {
 }
 
 export type TipoBloque = 'texto' | 'imagen' | 'video';
-export type TamanoBloque = 'chica' | 'mediana' | 'banner';
+// Mismo vocabulario que el tamaño de grilla de las obras del home (chica /
+// normal / banner), para que sea un solo sistema.
+export type TamanoBloque = 'chica' | 'normal' | 'banner';
 
 /**
  * Bloque de contenido flexible de una página de obra (tabla obra_bloques). Es
- * el contenido libre debajo del subtítulo: reemplazó a texto_extendido y a la
- * galería obra_imagenes (retirados). Según el tipo se llenan campos distintos:
- * texto → contenido; imagen → imagenUrl + tamano; video → videoUrl. Los campos
- * no usados por un tipo quedan null.
+ * el contenido libre debajo del subtítulo. Según el tipo se llenan campos
+ * distintos:
+ *   texto  → contenido (+ titulo opcional, encabezado arriba del texto);
+ *   imagen → imagenUrl + tamano (chica / normal / banner);
+ *   video  → videoUrl + videoAncho (% de la columna: 25 / 50 / 75 / 100).
+ * Los campos no usados por un tipo quedan null.
  */
 export interface Bloque {
   id: string;
@@ -36,9 +40,11 @@ export interface Bloque {
   tipo: TipoBloque;
   orden: number;
   contenido: string | null;
+  titulo: string | null;
   imagenUrl: string | null;
   tamano: TamanoBloque | null;
   videoUrl: string | null;
+  videoAncho: number | null;
 }
 
 export interface ImagenProceso {
