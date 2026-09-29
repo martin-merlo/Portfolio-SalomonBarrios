@@ -100,7 +100,10 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
         );
         tl.to(navBg, { opacity: NAVBG_MAX_OPACITY, ease: 'none' }, 0);
         if (heroSub) tl.to(heroSub, { opacity: 0, ease: 'none' }, 0);
-        if (heroDecl) tl.to(heroDecl, { opacity: 0, ease: 'none' }, 0);
+        // autoAlpha = misma curva de opacidad que heroSub + visibility:hidden al
+        // llegar a 0, para que los controles de paginación de la declaración
+        // (pinneados e invisibles) no capturen clicks del contenido de abajo.
+        if (heroDecl) tl.to(heroDecl, { autoAlpha: 0, ease: 'none' }, 0);
         st = tl.scrollTrigger;
         return;
       }
@@ -150,8 +153,12 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
       if (heroSub) tl.to(heroSub, { opacity: 0, y: -10, ease: 'none', duration: 1 }, 0);
       // Mismo tween que #hero-sub: el bloque de la declaración (título + texto)
       // se funde parejo con el subtítulo del nombre. Misma curva (ease:'none'),
-      // mismo timing (posición 0, duration 1) y mismo y:-10 de deriva.
-      if (heroDecl) tl.to(heroDecl, { opacity: 0, y: -10, ease: 'none', duration: 1 }, 0);
+      // mismo timing (posición 0, duration 1) y mismo y:-10 de deriva. autoAlpha
+      // en vez de opacity: misma curva de opacidad, más visibility:hidden al
+      // llegar a 0 — la declaración está paginada y tiene botones, que quedan
+      // pinneados sobre el papel cuando el bloque ya es invisible; sin esto
+      // seguirían capturando clicks.
+      if (heroDecl) tl.to(heroDecl, { autoAlpha: 0, y: -10, ease: 'none', duration: 1 }, 0);
       // Cruce de las dos copias del título ("que vuela" vs. la fija del
       // navbar). OJO antes de tocar esto: las dos curvas de opacidad se
       // superponen A PROPÓSITO — es la solución a un bug de hace varias

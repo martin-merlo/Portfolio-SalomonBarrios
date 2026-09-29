@@ -1,5 +1,6 @@
 import type { ContenidoSitio } from '@/lib/tipos';
 import { fondoImagen } from '@/lib/imagen';
+import DeclaracionPaginada from './DeclaracionPaginada';
 
 export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
   return (
@@ -105,21 +106,16 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
             </p>
           </div>
 
-          {/* Alineado a la izquierda (pedido del artista, diseño original) y
-              agrandado — antes text-sm/base y text-xs/sm, quedaba chico.
+          {/* Alineado a la izquierda (pedido del artista, diseño original).
               md:mr-*: corrido un poco del borde derecho (referencia de diseño
-              original, centro-derecha en vez de pegado al borde).
-              id="hero-declaracion": el Navbar lo desvanece con el scroll con el
-              MISMO tween que al subtítulo del nombre (#hero-sub), para que el
-              bloque completo (título + texto) se funda parejo con él. */}
-          <div id="hero-declaracion" className="max-w-sm md:mt-2 md:mr-6 lg:mr-14 xl:mr-20">
-            <h2 className="font-mono uppercase tracking-wide text-claro text-base sm:text-lg lg:text-xl mb-3">
-              {contenido.declaracionTitulo}
-            </h2>
-            <p className="font-mono text-claro/85 text-sm sm:text-base lg:text-lg leading-relaxed text-left">
-              {contenido.declaracionTexto}
-            </p>
-          </div>
+              original, centro-derecha en vez de pegado al borde). Paginada
+              porque el texto es largo; lleva id="hero-declaracion", que el
+              Navbar desvanece con el scroll con el MISMO tween que al subtítulo
+              del nombre (#hero-sub). Ver DeclaracionPaginada. */}
+          <DeclaracionPaginada
+            titulo={contenido.declaracionTitulo}
+            texto={contenido.declaracionTexto}
+          />
         </div>
       </div>
     </>
