@@ -24,7 +24,7 @@ export default function ObraCard({ obra }: { obra: Obra }) {
   const clickeable = obra.tienePaginaPropia;
   const etiqueta = `${obra.titulo}${obra.tecnica ? `, ${obra.tecnica}` : ''}${obra.anio ? `, ${obra.anio}` : ''}`;
 
-  const className = `${styles.card} group relative overflow-hidden ${SPAN[obra.tamanoGrilla]} ${
+  const className = `${styles.card} group relative overflow-hidden shadow-sutil ${SPAN[obra.tamanoGrilla]} ${
     clickeable ? 'cursor-pointer' : 'cursor-default'
   }`;
 

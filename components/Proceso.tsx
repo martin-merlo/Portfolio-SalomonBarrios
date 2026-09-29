@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 function Card({ item }: { item: ImagenProceso }) {
   return (
-    <div className="relative w-[220px] h-[280px] sm:w-[280px] sm:h-[340px] shrink-0 mx-2 sm:mx-3 overflow-hidden rounded-sm">
+    <div className="relative w-[220px] h-[280px] sm:w-[280px] sm:h-[340px] shrink-0 mx-2 sm:mx-3 overflow-hidden rounded-sm shadow-sutil">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: fondoImagen(item.imagenUrl) }}
@@ -119,7 +119,7 @@ export default function Proceso({ items }: { items: ImagenProceso[] }) {
   if (!loopHabilitado) {
     return (
       <section aria-label="Proceso de trabajo" className="py-10 sm:py-16">
-        <div className={`flex overflow-x-auto ${MARGEN_PAPEL}`}>
+        <div className={`flex overflow-x-auto py-5 -my-5 ${MARGEN_PAPEL}`}>
           {items.map((item) => (
             <Card key={item.id} item={item} />
           ))}
@@ -132,8 +132,10 @@ export default function Proceso({ items }: { items: ImagenProceso[] }) {
 
   return (
     <section ref={seccionRef} aria-label="Proceso de trabajo" className="overflow-hidden py-10 sm:py-16">
+      {/* py-5 -my-5: aire para que overflow-hidden no corte la sombra de las
+          cards arriba/abajo, sin cambiar el alto que ocupa la sección. */}
       <div
-        className="overflow-hidden"
+        className="overflow-hidden py-5 -my-5"
         onMouseEnter={() => (hoverRef.current = true)}
         onMouseLeave={() => (hoverRef.current = false)}
       >

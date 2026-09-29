@@ -25,14 +25,14 @@ export default function Cav({ texto }: { texto: string }) {
         <SectionLabel texto="CV.3" />
 
         {/*
-         * Cuadro de color sólido (#F2F0EF, token recuadro) detrás del texto,
+         * Cuadro de color sólido (token recuadro = claro, #F7F6F2, con sombra sutil) detrás del texto,
          * ajustado al bloque con padding — reemplaza a la capa soft-light. Va en
          * un wrapper EXTERIOR a propósito: la paginación mide la caja de
          * PistaPaginas como el espacio disponible de cada página, así que el
          * padding no puede ir en ese mismo div (las páginas quedarían más chicas
          * que lo medido y el texto se desbordaría).
          */}
-        <div ref={cajaRef} className="bg-recuadro px-4 py-4 sm:px-7 sm:py-6">
+        <div ref={cajaRef} className="bg-recuadro shadow-sutil px-4 py-4 sm:px-7 sm:py-6">
           <PistaPaginas
             contenedorRef={contenedorRef}
             paginas={paginas}

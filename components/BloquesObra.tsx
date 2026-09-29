@@ -88,14 +88,15 @@ function BloqueImagen({ url, tamano }: { url: string; tamano: TamanoBloque }) {
     <div className={`mx-auto ${ANCHO_BLOQUE[tamano]}`}>
       {/* width/height son sólo la relación por defecto para reservar espacio;
           w-full h-auto la muestra responsive respetando el alto real. next/image
-          la optimiza (resize + formato) igual. */}
+          la optimiza (resize + formato) igual. Sombra con drop-shadow (no
+          box-shadow): si el artista sube un PNG recortado, sigue su forma. */}
       <Image
         src={url}
         alt=""
         width={1600}
         height={1067}
         sizes={SIZES_BLOQUE[tamano]}
-        className="w-full h-auto rounded-sm"
+        className="w-full h-auto rounded-sm drop-shadow-sutil"
       />
     </div>
   );

@@ -29,8 +29,23 @@
   --color-claro: #f7f6f2;
   --color-papel: #f4f1e4;
   /* Cuadro sólido detrás de los bloques de texto largos (Bio, CV), para que se
-     lean sobre fondo limpio en vez de directo sobre la textura de papel. */
-  --color-recuadro: #f2f0ef;
+     lean sobre fondo limpio en vez de directo sobre la textura de papel. Mismo
+     blanco roto que el título (claro); antes era #f2f0ef. */
+  --color-recuadro: var(--color-claro);
+
+  /* Sombra sutil que despega imágenes y cuadros del papel (pedido del artista:
+     "drop shadow al 5% en multiply"). Color = tinta: con un color casi negro y
+     alfa bajo, la mezcla normal da prácticamente lo mismo que multiply sobre el
+     papel claro, sin necesitar capas extra con mix-blend-mode. Una sola capa y
+     sin spread para que el MISMO valor sirva en box-shadow (shadow-sutil,
+     cuadros y cards rectangulares) y en filter: drop-shadow()
+     (drop-shadow-sutil, imágenes que pueden traer transparencia).
+     Ajustado a ojo sobre render real: al 5%-6% con blur chico apenas se veía y,
+     lo poco que se veía, pegado al borde, se leía como una línea más que como
+     sombra; con 10% y blur de 16px se lee como sombra difusa, sin romper la
+     estética plana. Se extiende ~19px hacia abajo (offset 3 + blur 16): los
+     contenedores con overflow-hidden alrededor (carrusel) dejan ese aire. */
+  --sombra-sutil: 0 3px 16px rgb(0 0 20 / 0.1);
 }
 
 @theme inline {
@@ -39,6 +54,9 @@
   --color-claro: var(--color-claro);
   --color-papel: var(--color-papel);
   --color-recuadro: var(--color-recuadro);
+
+  --shadow-sutil: var(--sombra-sutil);
+  --drop-shadow-sutil: var(--sombra-sutil);
 
   /* Display — Sekuya, un solo peso, uso exclusivo del título del hero. */
   --font-display: var(--font-display-raw), 'Arial Black', sans-serif;
