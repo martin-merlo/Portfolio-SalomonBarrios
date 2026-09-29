@@ -1,4 +1,5 @@
 import type { ContenidoSitio } from '@/lib/tipos';
+import { MARGEN_PAPEL } from '@/lib/estilos';
 import SectionLabel from './SectionLabel';
 
 function IconoInstagram() {
@@ -32,7 +33,7 @@ function IconoTikTok() {
 
 export default function Contacto({ contenido }: { contenido: ContenidoSitio }) {
   return (
-    <section id="contacto" className="px-5 sm:px-10 lg:px-14 pb-24 sm:pb-32">
+    <section id="contacto" className={`${MARGEN_PAPEL} pb-24 sm:pb-32`}>
       <div className="max-w-[1500px] mx-auto">
         <SectionLabel texto="Contactame.4" entradaPanel />
 

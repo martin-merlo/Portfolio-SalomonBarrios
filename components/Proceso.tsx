@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import type { ImagenProceso } from '@/lib/tipos';
 import { fondoImagen } from '@/lib/imagen';
+import { MARGEN_PAPEL } from '@/lib/estilos';
 
 function Card({ item }: { item: ImagenProceso }) {
   return (
@@ -66,7 +67,7 @@ export default function Proceso({ items }: { items: ImagenProceso[] }) {
   if (!loopHabilitado) {
     return (
       <section aria-label="Proceso de trabajo" className="py-10 sm:py-16">
-        <div className="flex overflow-x-auto px-5 sm:px-10 lg:px-14">
+        <div className={`flex overflow-x-auto ${MARGEN_PAPEL}`}>
           {items.map((item) => (
             <Card key={item.id} item={item} />
           ))}

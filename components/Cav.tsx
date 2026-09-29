@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { MARGEN_PAPEL } from '@/lib/estilos';
 import SectionLabel from './SectionLabel';
 
 const CLASE_TEXTO_PAGINA = 'font-cuerpo text-sm sm:text-base leading-relaxed pr-2 sm:pr-6';
@@ -123,39 +124,36 @@ export default function Cav({ texto }: { texto: string }) {
   }
 
   return (
-    <section id="cav" className="px-5 sm:px-10 lg:px-14 pb-20 sm:pb-28">
+    <section id="cav" className={`${MARGEN_PAPEL} pb-20 sm:pb-28`}>
       <div className="max-w-[1500px] mx-auto">
         <SectionLabel texto="CV.3" />
 
-        <div
-          ref={contenedorRef}
-          className="relative overflow-hidden h-[360px] sm:h-[420px] lg:h-[460px]"
-        >
-          {/*
-           * Capa soft-light detrás del texto (valor de InDesign del
-           * artista): mismo color claro que el texto usa en otras secciones,
-           * mix-blend-mode: soft-light al 100%, para levantar el contraste
-           * contra la textura de papel de PaperSurface. Necesita su propio
-           * "relative" en el track de abajo: dos elementos posicionados se
-           * apilan por orden en el DOM, así que esta capa (declarada primero)
-           * queda debajo del texto sin depender de z-index.
-           */}
-          <div aria-hidden="true" className="absolute inset-0 bg-claro mix-blend-soft-light" />
-          <div
-            className="relative flex h-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:duration-0"
-            style={{ transform: `translateX(-${pagina * 100}%)` }}
-          >
-            {paginas.map((contenido, i) => (
-              <div
-                key={i}
-                role="tabpanel"
-                aria-hidden={i !== pagina}
-                className={`w-full h-full shrink-0 ${CLASE_TEXTO_PAGINA}`}
-                style={{ whiteSpace: 'pre-line' }}
-              >
-                {contenido}
-              </div>
-            ))}
+        {/*
+         * Cuadro de color sólido (#F2F0EF, token recuadro) detrás del texto,
+         * ajustado al bloque con padding — reemplaza a la capa soft-light. Va en
+         * un wrapper EXTERIOR a propósito: la paginación mide el
+         * getBoundingClientRect de contenedorRef como la caja disponible para
+         * cada página, así que el padding no puede ir en ese mismo div (las
+         * páginas quedarían más chicas que lo medido y el texto se desbordaría).
+         */}
+        <div className="bg-recuadro px-4 py-4 sm:px-7 sm:py-6">
+          <div ref={contenedorRef} className="overflow-hidden h-[360px] sm:h-[420px] lg:h-[460px]">
+            <div
+              className="flex h-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:duration-0"
+              style={{ transform: `translateX(-${pagina * 100}%)` }}
+            >
+              {paginas.map((contenido, i) => (
+                <div
+                  key={i}
+                  role="tabpanel"
+                  aria-hidden={i !== pagina}
+                  className={`w-full h-full shrink-0 ${CLASE_TEXTO_PAGINA}`}
+                  style={{ whiteSpace: 'pre-line' }}
+                >
+                  {contenido}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

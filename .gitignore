@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Originales pesados de referencia (scan de impresión, 56 MB) — el sitio usa
+# la versión reducida en public/imagenes/fondo-infinito.webp.
+referencia/fondoinfinito.png

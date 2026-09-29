@@ -28,6 +28,9 @@
   --color-navbar: #2a2a36;
   --color-claro: #f7f6f2;
   --color-papel: #f4f1e4;
+  /* Cuadro sólido detrás de los bloques de texto largos (Bio, CV), para que se
+     lean sobre fondo limpio en vez de directo sobre la textura de papel. */
+  --color-recuadro: #f2f0ef;
 }
 
 @theme inline {
@@ -35,6 +38,7 @@
   --color-navbar: var(--color-navbar);
   --color-claro: var(--color-claro);
   --color-papel: var(--color-papel);
+  --color-recuadro: var(--color-recuadro);
 
   /* Display — Sekuya, un solo peso, uso exclusivo del título del hero. */
   --font-display: var(--font-display-raw), 'Arial Black', sans-serif;
@@ -67,6 +71,35 @@ body {
   background: var(--color-papel);
   color: var(--color-tinta);
   -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------
+ * Textura de papel del sitio (home y páginas de obra, vía PaperSurface y
+ * OlaPapel). fondo-infinito.webp sale de referencia/fondoinfinito.png:
+ *   - Es tileable SÓLO en vertical (junta arriba/abajo sin costura; la de
+ *     izquierda/derecha sí tiene costura). Por eso repeat-y y nunca repeat-x.
+ *   - Mide 2650px de ancho: el mínimo para cubrir hasta pantallas QHD (2560)
+ *     sin tener que repetirla de costado. El original es un scan de impresión
+ *     a 1200 dpi (5299px); a esa escala 1:1 el grano se veía ~4x más grande
+ *     que la textura anterior (una macro), así que se redujo al 50%, con un
+ *     resize que respeta el tile (relleno en wrap antes de reducir) para que
+ *     la junta vertical siga sin costura.
+ *   - Tamaño natural, sin background-size: cover (que la estiraría a lo alto
+ *     de toda la sección y la pixelaría).
+ * ------------------------------------------------------------------- */
+.textura-papel {
+  background-color: var(--color-papel);
+  background-image: url('/imagenes/fondo-infinito.webp');
+  background-repeat: repeat-y;
+  background-position: top center;
+}
+
+/* Para OlaPapel (la ola que va arriba del papel): anclada abajo, así su última
+   fila es la última fila del tile y el papel de abajo arranca en la primera —
+   justo la junta que es continua. Sin esto la textura "se reiniciaba" en el
+   límite ola/papel. */
+.textura-papel-pie {
+  background-position: bottom center;
 }
 
 :focus-visible {

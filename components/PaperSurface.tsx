@@ -64,14 +64,7 @@ export default function PaperSurface({ children }: { children: ReactNode }) {
       style={{ marginTop: '-19.6%' }}
     >
       <OlaPapel />
-      <div
-        className="relative bg-papel"
-        style={{
-          backgroundImage: 'url(/imagenes/textura-papel.webp)',
-          backgroundPosition: 'top center',
-          backgroundRepeat: 'repeat-y',
-        }}
-      >
+      <div className="relative textura-papel">
         <BordeOrnamental />
         {children}
       </div>

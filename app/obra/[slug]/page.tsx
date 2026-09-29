@@ -6,6 +6,7 @@ import ObraHero from '@/components/ObraHero';
 import PaperSurface from '@/components/PaperSurface';
 import SectionLabel from '@/components/SectionLabel';
 import BloquesObra from '@/components/BloquesObra';
+import { MARGEN_PAPEL } from '@/lib/estilos';
 
 // El artista va a estar editando obras desde el panel más adelante — no hace
 // falta que el contenido sea instantáneo, así que revalidamos cada 60s.
@@ -51,7 +52,7 @@ export default async function ObraPage({ params }: Params) {
         */}
         {tieneContenidoExtra && (
           <PaperSurface>
-            <section className="px-5 sm:px-10 lg:px-14 pt-20 sm:pt-28 pb-20 sm:pb-28 min-h-[70vh]">
+            <section className={`${MARGEN_PAPEL} pt-20 sm:pt-28 pb-20 sm:pb-28 min-h-[70vh]`}>
               <div className="max-w-[1500px] mx-auto">
                 {obra.subtituloExtendido && <SectionLabel texto={obra.subtituloExtendido} />}
                 <BloquesObra bloques={bloques} />

@@ -8,8 +8,18 @@ gsap.registerPlugin(ScrollTrigger);
 
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 
-const ANCHO_BORDE = 'w-[52px] sm:w-[80px] lg:w-[110px]';
-const ALTO_TIRA = 'h-[52px] sm:h-[80px] lg:h-[110px]';
+// Grosor de la tira (ancho del borde en cada margen). El dibujo ocupa sólo la
+// mitad EXTERIOR de la tira (la mitad interior del PNG es transparente), así que
+// el ornamento visible mide la mitad de esto. Desktop claramente más ancho que
+// antes (110→160); en mobile casi no crece (52→56) porque el contenido tiene
+// apenas px-5 (20px) de margen y un ornamento más grande quedaría debajo del
+// texto. OJO: el margen del contenido sobre el papel (MARGEN_PAPEL en
+// lib/estilos.ts) está calculado a partir de estos anchos — si cambian, revisarlo.
+const ANCHO_BORDE = 'w-[56px] sm:w-[110px] lg:w-[160px]';
+const ALTO_TIRA = 'h-[56px] sm:h-[110px] lg:h-[160px]';
+
+// 0.45 bajado un 15% relativo (0.45 × 0.85 ≈ 0.38): más sutil, sigue visible.
+const OPACIDAD_BORDE = 0.38;
 
 /**
  * Tira decorativa borde-ornamental.png (2080x500, dibujo en la mitad
@@ -141,7 +151,7 @@ export default function BordeOrnamental() {
         ref={izqOuterRef}
         aria-hidden="true"
         className={`absolute inset-y-0 left-0 overflow-hidden ${ANCHO_BORDE}`}
-        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: 0.45 }}
+        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: OPACIDAD_BORDE }}
       >
         <div
           ref={izqInnerRef}
@@ -159,7 +169,7 @@ export default function BordeOrnamental() {
         ref={derOuterRef}
         aria-hidden="true"
         className={`absolute inset-y-0 right-0 overflow-hidden ${ANCHO_BORDE}`}
-        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: 0.45 }}
+        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: OPACIDAD_BORDE }}
       >
         <div
           ref={derInnerRef}

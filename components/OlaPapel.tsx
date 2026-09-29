@@ -11,13 +11,11 @@ export default function OlaPapel() {
   return (
     <div
       aria-hidden="true"
-      className="block w-full"
+      // Textura en globals.css. "-pie" la ancla abajo para que empalme sin
+      // costura con el papel de PaperSurface que sigue justo debajo.
+      className="block w-full textura-papel textura-papel-pie"
       style={{
         aspectRatio: '1281 / 310',
-        backgroundColor: 'var(--color-papel)',
-        backgroundImage: "url('/imagenes/textura-papel.webp')",
-        backgroundPosition: 'top center',
-        backgroundRepeat: 'repeat-y',
         maskImage: "url('/imagenes/forma-recorte.png')",
         WebkitMaskImage: "url('/imagenes/forma-recorte.png')",
         maskRepeat: 'no-repeat',
