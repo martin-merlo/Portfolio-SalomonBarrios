@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { Bloque, TamanoBloque } from '@/lib/tipos';
+import { htmlVacio, sanitizarHtmlBloque } from '@/lib/sanitizarHtml';
 
 // Ancho por tamaño de imagen, con la misma proporción relativa que la grilla del
 // home: chica = angosta, normal = intermedia, banner = ancho completo de la
@@ -63,7 +64,12 @@ function parseEmbed(url: string): { src: string; vertical: boolean } | null {
 }
 
 function BloqueTexto({ titulo, contenido }: { titulo: string | null; contenido: string }) {
-  const parrafos = contenido.trim() ? contenido.split('\n\n') : [];
+  // HTML del editor del panel (o texto plano de bloques viejos, que
+  // sanitizarHtmlBloque convierte primero). SIEMPRE sanitizado antes de
+  // inyectarlo: sólo sobreviven p/br/strong/em/ul/ol/li/a — ver
+  // lib/sanitizarHtml.ts.
+  const html = sanitizarHtmlBloque(contenido);
+  const hayTexto = !htmlVacio(html);
   return (
     <div className="space-y-4">
       {titulo?.trim() && (
@@ -71,13 +77,14 @@ function BloqueTexto({ titulo, contenido }: { titulo: string | null; contenido: 
         // sitio, un escalón por debajo del subtítulo de la sección.
         <h3 className="font-subtitulo text-tinta text-base sm:text-lg">{titulo}</h3>
       )}
-      {parrafos.length > 0 && (
-        // Mismo estilo tipográfico que tenía el texto extendido (font mono de cuerpo).
-        <div className="font-cuerpo text-tinta text-sm sm:text-base leading-relaxed space-y-4">
-          {parrafos.map((parrafo, i) => (
-            <p key={i}>{parrafo}</p>
-          ))}
-        </div>
+      {hayTexto && (
+        // Mismo estilo tipográfico que tenía el texto extendido (font mono de
+        // cuerpo); negrita/listas/links con el estilo de .texto-rico
+        // (globals.css).
+        <div
+          className="texto-rico font-cuerpo text-tinta text-sm sm:text-base leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
       )}
     </div>
   );

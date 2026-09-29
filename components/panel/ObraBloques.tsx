@@ -7,6 +7,7 @@ import type { BloqueRow } from '@/lib/mapeo';
 import type { Bloque, TamanoBloque, TipoBloque } from '@/lib/tipos';
 import SubidaImagen from './SubidaImagen';
 import ListaOrdenable from './ListaOrdenable';
+import EditorTextoRico from './EditorTextoRico';
 
 // Mismos 3 botones visuales y vocabulario que el tamaño de grilla de las obras
 // del home (chica / normal / banner). Sólo para bloques de imagen.
@@ -224,13 +225,14 @@ export default function ObraBloques({ obraId }: { obraId: string }) {
                       placeholder="Título del bloque (opcional)"
                       className="w-full rounded border border-slate-300 px-3 py-2 text-sm font-medium"
                     />
-                    <textarea
-                      value={b.contenido ?? ''}
-                      onChange={(e) => setCampo(b.id, { contenido: e.target.value })}
-                      onBlur={() => persistir(b.id, { contenido: b.contenido })}
-                      rows={4}
-                      placeholder="Texto del bloque…"
-                      className="w-full rounded border border-slate-300 px-3 py-2 text-sm"
+                    {/* Rich text (Tiptap): guarda HTML al perder el foco. El
+                        título de arriba sigue siendo un input aparte. */}
+                    <EditorTextoRico
+                      valorInicial={b.contenido}
+                      onGuardar={(html) => {
+                        setCampo(b.id, { contenido: html });
+                        persistir(b.id, { contenido: html });
+                      }}
                     />
                   </div>
                 )}

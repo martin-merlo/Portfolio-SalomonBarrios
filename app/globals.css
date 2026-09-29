@@ -124,3 +124,58 @@ body {
   outline: 2px solid var(--color-tinta);
   outline-offset: 3px;
 }
+
+/* ---------------------------------------------------------------------
+ * Texto enriquecido de los bloques de texto de obra (HTML del editor Tiptap
+ * del panel, sanitizado en lib/sanitizarHtml.ts). Preflight de Tailwind borra
+ * márgenes, viñetas y numeración; acá se devuelven, acotado a lo que producen
+ * los 5 botones (párrafo, negrita, cursiva, listas, link). La tipografía y el
+ * color los pone el contenedor (font-cuerpo text-tinta), así que todo hereda.
+ * Lo usan también el editor del panel (misma clase) para que se vea parecido.
+ * ------------------------------------------------------------------- */
+.texto-rico > * + * {
+  margin-top: 1rem; /* = el space-y-4 que separaba los párrafos antes */
+}
+.texto-rico strong {
+  font-weight: 700;
+}
+.texto-rico em {
+  font-style: italic;
+}
+.texto-rico ul {
+  padding-left: 1.5em;
+  list-style-type: disc;
+}
+/* Más sangría que ul: el marcador "10." ocupa 3 caracteres de la mono. */
+.texto-rico ol {
+  padding-left: 2.5em;
+  list-style-type: decimal;
+}
+.texto-rico li + li {
+  margin-top: 0.35em;
+}
+.texto-rico li > p {
+  margin: 0;
+}
+/* a[href]: un <a> al que el sanitizador le quitó el href (javascript:, data:…)
+   queda como texto común, sin pinta de link. */
+.texto-rico a[href] {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+  transition: text-decoration-color 0.2s ease;
+}
+.texto-rico a[href]:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Placeholder del editor de texto enriquecido del panel (extensión Placeholder
+   de Tiptap: marca el párrafo vacío con .is-editor-empty + data-placeholder). */
+.editor-panel .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: #94a3b8;
+  pointer-events: none;
+}
