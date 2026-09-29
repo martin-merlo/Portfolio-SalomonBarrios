@@ -34,7 +34,7 @@ export default function ObraHero({
         <div>
           {/* text-[12vw], no 15vw: ver la misma nota en Hero.tsx — con 15vw un
               título largo se sale del viewport en 360/390px. */}
-          <h1 className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]">
+          <h1 data-aberracion="texto" className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]">
             {titulo}
           </h1>
         </div>

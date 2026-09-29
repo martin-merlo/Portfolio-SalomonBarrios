@@ -204,3 +204,12 @@ html.cursor-custom,
 html.cursor-custom * {
   cursor: none !important;
 }
+
+/* Aberración cromática en títulos grandes (components/AberracionCromatica.tsx):
+   separación rojo/cian con text-shadow, sólo mientras el efecto está activo
+   (el atributo lo pone/saca el componente; en reposo no hay text-shadow). */
+[data-aberracion='texto'][data-aberracion-activa] {
+  text-shadow:
+    calc(var(--ab-x, 0) * 1px) calc(var(--ab-y, 0) * 1px) 0 rgb(255 30 70 / 0.55),
+    calc(var(--ab-x, 0) * -1px) calc(var(--ab-y, 0) * -1px) 0 rgb(0 215 255 / 0.55);
+}

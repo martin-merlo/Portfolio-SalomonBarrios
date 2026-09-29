@@ -95,7 +95,9 @@ function BloqueTexto({ titulo, contenido }: { titulo: string | null; contenido: 
 
 function BloqueImagen({ url, tamano }: { url: string; tamano: TamanoBloque }) {
   return (
-    <div className={`mx-auto ${ANCHO_BLOQUE[tamano]}`}>
+    // data-aberracion en el wrapper: la <img> ya ocupa `filter` con su
+    // drop-shadow, y un filtro inline lo pisaría.
+    <div data-aberracion="imagen" className={`mx-auto ${ANCHO_BLOQUE[tamano]}`}>
       {/* width/height son sólo la relación por defecto para reservar espacio;
           w-full h-auto la muestra responsive respetando el alto real. next/image
           la optimiza (resize + formato) igual. Sombra con drop-shadow (no

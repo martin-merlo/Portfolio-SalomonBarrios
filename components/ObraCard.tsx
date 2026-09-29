@@ -30,18 +30,26 @@ export default function ObraCard({ obra }: { obra: Obra }) {
 
   const contenido = (
     <>
-      <div
-        className={`absolute inset-0 bg-cover bg-center ${!conHover ? styles.brillo : ''}`}
-        style={{ backgroundImage: fondoImagen(obra.imagenUrl) }}
-      />
-
-      {conHover && (
-        <>
+      {/* Las imágenes (base y la que entra al hover) van en un wrapper propio
+          con data-aberracion (ver AberracionCromatica): el filtro no puede ir
+          en la imagen base, que ya usa `filter` para el brillo del hover, y la
+          descripción/título quedan afuera — nada de aberración sobre texto. */}
+      <div data-aberracion="imagen" className="absolute inset-0">
+        <div
+          className={`absolute inset-0 bg-cover bg-center ${!conHover ? styles.brillo : ''}`}
+          style={{ backgroundImage: fondoImagen(obra.imagenUrl) }}
+        />
+        {conHover && (
           <div
             aria-hidden="true"
             className={`${styles.hoverSlide} absolute inset-0 bg-cover bg-center`}
             style={{ backgroundImage: fondoImagen(obra.imagenHoverUrl!) }}
           />
+        )}
+      </div>
+
+      {conHover && (
+        <>
           <div
             aria-hidden="true"
             className={`${styles.hoverOverlay} absolute inset-0 flex items-end bg-tinta/25`}

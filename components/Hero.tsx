@@ -92,6 +92,7 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
             */}
             <h1
               id="hero-title"
+              data-aberracion="texto"
               className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]"
               style={{ transformOrigin: 'left center', position: 'relative' }}
             >
