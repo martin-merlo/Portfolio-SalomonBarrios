@@ -55,32 +55,27 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
         className="sticky top-0 z-20 motion-reduce:z-0 w-full overflow-hidden pointer-events-none"
         style={{ height: 'calc(100vh - 100px)', marginTop: 'calc(-1 * (100vh - 100px))' }}
       >
-        <div className="h-full max-w-[1500px] mx-auto px-5 sm:px-10 lg:px-14 pt-16 md:pt-0 flex flex-col justify-center gap-10 md:flex-row md:items-center md:justify-between md:gap-12">
+        <div className="h-full px-5 sm:px-10 lg:px-14 pt-16 md:pt-0 flex flex-col justify-center gap-10 md:flex-row md:items-center md:justify-between md:gap-12">
           {/*
-            lg:pl-32/xl:pl-44 acá son a propósito, no relleno cosmético: el
-            Navbar mide en vivo la distancia entre este título y su slot en
-            el navbar (que vive con su propio inset, mucho más ajustado:
-            px-3/8/12) para animar el "vuelo" del título al anclarse. Sin este
-            inset extra, en anchos de escritorio comunes (~1280–1536px) el
-            padding del hero y el del navbar casi coinciden y el desplazamiento
-            horizontal medido queda en unos pocos píxeles contra ~350px de
-            desplazamiento vertical — la trayectoria se ve prácticamente
-            recta hacia arriba en vez de diagonal hacia arriba-izquierda como
-            en diseño.pdf. (Antes lg:pl-24/xl:pl-32 — muy poco diagonal — se
-            dobló a lg:pl-48/xl:pl-64 — diagonal muy marcada pero título
-            quedaba centrado — luego se recortó a lg:pl-36/xl:pl-48, y ahora a
-            lg:pl-32/xl:pl-44 para arrancar un paso más a la izquierda. Medido a
-            1280x800 el ratio |deltaX|/|deltaY| del anclaje pasa de ~0.69 a
-            ~0.63 en xl y de ~0.52 a ~0.47 en lg: la diagonal sigue claramente
-            marcada. Un paso más — lg:pl-28/xl:pl-40 — la aplanaría a ~0.41/~0.58
-            y no vale la pena; este es el punto razonable más a la izquierda.)
-            Sigue siendo solo un mayor punto de partida — el deltaX
-            real lo sigue midiendo Navbar en vivo, así que el aterrizaje sigue
-            coincidiendo exacto con el slot del navbar sin importar este
-            valor. Este inset solo se nota en desktop (lg:+): mobile usa
-            crossfade en vez de mover el título, así que no lo necesita.
+            Posición del título: prioriza la COMPOSICIÓN en reposo (como en
+            referencia/diseño.pdf, donde el título arranca a ~12% del ancho) por
+            sobre lo marcada que quede la diagonal del vuelo al navbar.
+            - lg:pl-[7.5vw] (+ el lg:px-14 del contenedor): 1024 → ~133px,
+              1280 → 152px, 1440 → 164px. En vw a propósito: el título mismo se
+              mide en vw, así que el bloque mantiene la proporción en cualquier
+              ancho de escritorio. Por lo mismo esta capa NO lleva el tope
+              max-w-[1500px] que usan las demás secciones: con el tope, a 1920px
+              el título quedaba centrado (~22% del ancho) en vez de a la izquierda.
+            - Costo aceptado: el Navbar mide en vivo el delta entre este título y
+              su slot en el navbar (px-3/8/12). Con el título más a la izquierda
+              el desplazamiento horizontal se achica y la trayectoria queda menos
+              diagonal (|deltaX|/|deltaY| ≈ 0.36 a 1280x800, antes 0.63). El
+              ATERRIZAJE no cambia: el destino se mide en vivo, sigue llegando
+              exacto (0px) al left del slot sin importar este valor.
+            - Solo desktop (lg:+). En md el título ya va pegado al padding del
+              contenedor, y mobile usa crossfade en vez de vuelo.
           */}
-          <div className="lg:pl-32 xl:pl-44">
+          <div className="lg:pl-[7.5vw]">
             {/*
               text-[12vw] en vez de 15vw: medido en vivo, "SALOMÓN BARRIOS" con
               15vw se salía del viewport por ~45px en 360/390px (overflow-hidden
@@ -107,8 +102,8 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
           </div>
 
           {/* Alineado a la izquierda (pedido del artista, diseño original).
-              md:mr-*: corrido un poco del borde derecho (referencia de diseño
-              original, centro-derecha en vez de pegado al borde). Paginada
+              Cuadro grande (ancho/alto en DeclaracionPaginada), apenas corrido
+              del borde derecho con lg:mr-*. Paginada
               porque el texto es largo; lleva id="hero-declaracion", que el
               Navbar desvanece con el scroll con el MISMO tween que al subtítulo
               del nombre (#hero-sub). Ver DeclaracionPaginada. */}
