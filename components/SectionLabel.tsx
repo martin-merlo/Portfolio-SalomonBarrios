@@ -9,6 +9,7 @@ interface SectionLabelProps {
    * pasa en true. El "~" sigue viéndose exactamente igual — un botón, no un
    * <a> (nada de href rastreable), con el área clickeable ampliada vía
    * padding + margen negativo para no mover el layout ni cambiar cómo se ve.
+   * Lleva data-cursor-ignore: el cursor custom no se agranda encima.
    */
   entradaPanel?: boolean;
 }
@@ -28,6 +29,9 @@ export default function SectionLabel({ texto, entradaPanel = false }: SectionLab
           type="button"
           aria-hidden="true"
           tabIndex={-1}
+          // El cursor custom no reacciona acá (ver CursorCustom): agrandarse
+          // delataría que es clickeable.
+          data-cursor-ignore=""
           onClick={() => router.push('/panel/login')}
           className="relative inline-flex items-center justify-center p-[13px] -m-[13px]"
         >

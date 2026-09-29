@@ -196,3 +196,11 @@ body {
   color: #94a3b8;
   pointer-events: none;
 }
+
+/* Cursor custom (components/CursorCustom.tsx): la clase la pone el componente
+   en <html> SÓLO cuando está activo (sitio público + mouse real). En /panel y
+   en touch nunca se agrega, así que el cursor del sistema queda intacto. */
+html.cursor-custom,
+html.cursor-custom * {
+  cursor: none !important;
+}

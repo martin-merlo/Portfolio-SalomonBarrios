@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { cousine, sekuya } from '@/lib/fonts';
+import CursorCustom from '@/components/CursorCustom';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -16,6 +17,8 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${sekuya.variable} ${cousine.variable} bg-papel text-tinta antialiased`}>
         {children}
+        {/* Se autodescarta en /panel y en dispositivos sin mouse real. */}
+        <CursorCustom />
       </body>
     </html>
   );
