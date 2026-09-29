@@ -5,6 +5,7 @@ import PaperSurface from '@/components/PaperSurface';
 import Bio from '@/components/Bio';
 import Work from '@/components/Work';
 import Cav from '@/components/Cav';
+import { sanitizarHtmlRico } from '@/lib/sanitizarHtml';
 import Proceso from '@/components/Proceso';
 import Contacto from '@/components/Contacto';
 
@@ -27,7 +28,7 @@ export default async function Home() {
         <PaperSurface>
           <Bio texto={contenido.bioTexto} />
           <Work obras={obras} />
-          <Cav texto={contenido.cvTexto} />
+          <Cav html={sanitizarHtmlRico(contenido.cvTexto)} />
           <Proceso items={proceso} />
           <Contacto contenido={contenido} />
         </PaperSurface>

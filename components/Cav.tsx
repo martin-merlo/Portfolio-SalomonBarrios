@@ -7,11 +7,15 @@ import { useRuedaPaginas } from '@/lib/useRuedaPaginas';
 import SectionLabel from './SectionLabel';
 import { ControlesPaginas, PistaPaginas } from './Paginacion';
 
-const CLASE_TEXTO_PAGINA = 'font-cuerpo text-sm sm:text-base leading-relaxed pr-2 sm:pr-6';
+// texto-rico: formato del editor (negrita, listas, links); texto-rico--lineas:
+// separa párrafos con una línea en blanco, como el texto plano de antes.
+const CLASE_TEXTO_PAGINA =
+  'texto-rico texto-rico--lineas font-cuerpo text-tinta text-sm sm:text-base leading-relaxed pr-2 sm:pr-6';
 
-export default function Cav({ texto }: { texto: string }) {
+/** `html`: el CV ya sanitizado (lo sanitiza app/page.tsx, server component). */
+export default function Cav({ html }: { html: string }) {
   const { contenedorRef, paginas, pagina, setPagina, ir, total } = usePaginacion(
-    texto,
+    html,
     CLASE_TEXTO_PAGINA,
   );
   // Rueda del mouse encima del cuadro = pasar páginas (sin atrapar el scroll
@@ -30,9 +34,10 @@ export default function Cav({ texto }: { texto: string }) {
          * un wrapper EXTERIOR a propósito: la paginación mide la caja de
          * PistaPaginas como el espacio disponible de cada página, así que el
          * padding no puede ir en ese mismo div (las páginas quedarían más chicas
-         * que lo medido y el texto se desbordaría).
+         * que lo medido y el texto se desbordaría). `relative`: queda por
+         * encima del borde ornamental (ver Bio.tsx).
          */}
-        <div ref={cajaRef} className="bg-recuadro shadow-sutil px-4 py-4 sm:px-7 sm:py-6">
+        <div ref={cajaRef} className="relative bg-recuadro shadow-sutil px-4 py-4 sm:px-7 sm:py-6">
           <PistaPaginas
             contenedorRef={contenedorRef}
             paginas={paginas}

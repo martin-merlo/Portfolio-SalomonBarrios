@@ -14,8 +14,10 @@ import { ControlesPaginas, PistaPaginas } from './Paginacion';
 const ALTO_CAJA =
   'h-[max(24vh,min(30vh,calc(100vh_-_474px)))] md:h-[min(55vh,calc(100vh_-_340px))]';
 
-// Misma tipografía que tenía el párrafo de la declaración.
-const CLASE_TEXTO = 'font-mono text-claro/85 text-sm sm:text-base lg:text-lg leading-relaxed text-left';
+// Misma tipografía que tenía el párrafo de la declaración, + formato del editor
+// (texto-rico) con párrafos separados por una línea en blanco como antes.
+const CLASE_TEXTO =
+  'texto-rico texto-rico--lineas font-mono text-claro/85 text-sm sm:text-base lg:text-lg leading-relaxed text-left';
 
 /**
  * Declaración del artista (bloque a la derecha del hero), paginada
@@ -33,6 +35,8 @@ const CLASE_TEXTO = 'font-mono text-claro/85 text-sm sm:text-base lg:text-lg lea
  *    Navbar le pone visibility:hidden (autoAlpha), así esos botones invisibles
  *    no siguen capturando clicks sobre el papel.
  *  - Con una sola página no se muestran controles.
+ *  - Por lo mismo, los links del texto llevan pointer-events-auto
+ *    ([&_a[href]]); el resto del texto sigue sin capturar clicks.
  *
  * Ancho: hasta 40vw (tope 640px) en desktop para que entre bastante texto
  * por página. Si no hay lugar, el flex del hero lo angosta antes que pisar al
@@ -41,11 +45,12 @@ const CLASE_TEXTO = 'font-mono text-claro/85 text-sm sm:text-base lg:text-lg lea
  * flex toma el mínimo de la pista de páginas (todas en fila) y el bloque se
  * salía del hero por la derecha en tablet (768–1023px), recortado.
  */
-export default function DeclaracionPaginada({ titulo, texto }: { titulo: string; texto: string }) {
-  const { contenedorRef, paginas, pagina, setPagina, ir, total } = usePaginacion(texto, CLASE_TEXTO);
+/** `html`: la declaración ya sanitizada (la sanitiza Hero, server component). */
+export default function DeclaracionPaginada({ titulo, html }: { titulo: string; html: string }) {
+  const { contenedorRef, paginas, pagina, setPagina, ir, total } = usePaginacion(html, CLASE_TEXTO);
 
   return (
-    <div id="hero-declaracion" className="w-full min-w-0 max-w-sm md:max-w-md lg:max-w-[min(40vw,640px)] md:mt-2 lg:mr-6 xl:mr-10">
+    <div id="hero-declaracion" className="w-full min-w-0 max-w-sm md:max-w-md lg:max-w-[min(40vw,640px)] md:mt-2 lg:mr-6 xl:mr-10 [&_a[href]]:pointer-events-auto">
       <h2 className="font-mono uppercase tracking-wide text-claro text-base sm:text-lg lg:text-xl mb-3">
         {titulo}
       </h2>

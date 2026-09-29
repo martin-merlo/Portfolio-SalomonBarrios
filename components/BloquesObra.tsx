@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import type { Bloque, TamanoBloque } from '@/lib/tipos';
-import { htmlVacio, sanitizarHtmlBloque } from '@/lib/sanitizarHtml';
+import { htmlVacio, sanitizarHtmlRico } from '@/lib/sanitizarHtml';
 
 // Ancho por tamaño de imagen, con la misma proporción relativa que la grilla del
 // home: chica = angosta, normal = intermedia, banner = ancho completo de la
@@ -65,13 +65,16 @@ function parseEmbed(url: string): { src: string; vertical: boolean } | null {
 
 function BloqueTexto({ titulo, contenido }: { titulo: string | null; contenido: string }) {
   // HTML del editor del panel (o texto plano de bloques viejos, que
-  // sanitizarHtmlBloque convierte primero). SIEMPRE sanitizado antes de
+  // sanitizarHtmlRico convierte primero). SIEMPRE sanitizado antes de
   // inyectarlo: sólo sobreviven p/br/strong/em/ul/ol/li/a — ver
   // lib/sanitizarHtml.ts.
-  const html = sanitizarHtmlBloque(contenido);
+  const html = sanitizarHtmlRico(contenido);
   const hayTexto = !htmlVacio(html);
   return (
-    <div className="space-y-4">
+    // Mismo cuadro que Bio y CV: fondo sólido claro (token recuadro), mismo
+    // padding y la sombra sutil. Título y texto van adentro. `relative`: queda
+    // por encima del borde ornamental (ver Bio.tsx).
+    <div className="relative bg-recuadro shadow-sutil px-4 py-4 sm:px-7 sm:py-6 space-y-4">
       {titulo?.trim() && (
         // Encabezado del bloque: misma tipografía de subtítulo que el resto del
         // sitio, un escalón por debajo del subtítulo de la sección.

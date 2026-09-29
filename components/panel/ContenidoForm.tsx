@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { CLAVES_CONTENIDO } from '@/lib/mapeo';
 import type { ContenidoSitio } from '@/lib/tipos';
 import SubidaImagen from './SubidaImagen';
+import EditorTextoRico from './EditorTextoRico';
 
 export default function ContenidoForm({ contenidoInicial }: { contenidoInicial: ContenidoSitio }) {
   const router = useRouter();
@@ -97,24 +98,30 @@ export default function ContenidoForm({ contenidoInicial }: { contenidoInicial: 
             className="input"
           />
         </Campo>
-        <Campo label="Texto">
-          <textarea
-            value={contenido.declaracionTexto}
-            onChange={(e) => set('declaracionTexto', e.target.value)}
-            rows={4}
-            className="input"
+        <Campo
+          label="Texto"
+          sinLabel
+          ayuda="Se corta solo en páginas en el sitio según el largo."
+        >
+          <EditorTextoRico
+            valorInicial={contenido.declaracionTexto}
+            onCambio={(html) => set('declaracionTexto', html ?? '')}
+            etiqueta="Texto de la declaración del artista"
+            placeholder="Texto de la declaración…"
+            altoMinimo="min-h-[8rem]"
           />
         </Campo>
       </section>
 
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">Bio</h2>
-        <Campo label="Texto de bio">
-          <textarea
-            value={contenido.bioTexto}
-            onChange={(e) => set('bioTexto', e.target.value)}
-            rows={8}
-            className="input"
+        <Campo label="Texto de bio" sinLabel>
+          <EditorTextoRico
+            valorInicial={contenido.bioTexto}
+            onCambio={(html) => set('bioTexto', html ?? '')}
+            etiqueta="Texto de bio"
+            placeholder="Texto de bio…"
+            altoMinimo="min-h-[12rem]"
           />
         </Campo>
       </section>
@@ -123,13 +130,15 @@ export default function ContenidoForm({ contenidoInicial }: { contenidoInicial: 
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">CV</h2>
         <Campo
           label="Texto de CV"
+          sinLabel
           ayuda="Este texto se corta solo en páginas en el sitio público según el largo — no te preocupes por dónde cortarlo, escribilo corrido."
         >
-          <textarea
-            value={contenido.cvTexto}
-            onChange={(e) => set('cvTexto', e.target.value)}
-            rows={14}
-            className="input"
+          <EditorTextoRico
+            valorInicial={contenido.cvTexto}
+            onCambio={(html) => set('cvTexto', html ?? '')}
+            etiqueta="Texto de CV"
+            placeholder="Texto de CV…"
+            altoMinimo="min-h-[20rem]"
           />
         </Campo>
       </section>
@@ -200,17 +209,26 @@ export default function ContenidoForm({ contenidoInicial }: { contenidoInicial: 
 function Campo({
   label,
   ayuda,
+  sinLabel = false,
   children,
 }: {
   label: string;
   ayuda?: string;
+  /**
+   * Para el editor de texto enriquecido: NO puede ir dentro de un <label>,
+   * porque el label reenvía los clicks a su primer control (el botón
+   * "Negrita" de la barra) y cada click en el texto activaría la negrita. El
+   * editor lleva su propio aria-label.
+   */
+  sinLabel?: boolean;
   children: React.ReactNode;
 }) {
+  const Contenedor = sinLabel ? 'div' : 'label';
   return (
-    <label className="block space-y-1">
+    <Contenedor className="block space-y-1">
       <span className="block text-sm font-medium text-slate-700">{label}</span>
       {children}
       {ayuda && <span className="block text-xs text-slate-500">{ayuda}</span>}
-    </label>
+    </Contenedor>
   );
 }

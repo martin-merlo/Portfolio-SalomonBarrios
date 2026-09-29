@@ -1,5 +1,6 @@
 import type { ContenidoSitio } from '@/lib/tipos';
 import { fondoImagen } from '@/lib/imagen';
+import { sanitizarHtmlRico } from '@/lib/sanitizarHtml';
 import DeclaracionPaginada from './DeclaracionPaginada';
 
 export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
@@ -109,7 +110,7 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
               del nombre (#hero-sub). Ver DeclaracionPaginada. */}
           <DeclaracionPaginada
             titulo={contenido.declaracionTitulo}
-            texto={contenido.declaracionTexto}
+            html={sanitizarHtmlRico(contenido.declaracionTexto)}
           />
         </div>
       </div>

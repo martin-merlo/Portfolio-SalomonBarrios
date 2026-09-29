@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { EditorContent, useEditor, useEditorState, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import { ListItem } from '@tiptap/extension-list';
 import { Placeholder } from '@tiptap/extensions';
 import { normalizarContenido } from '@/lib/textoRico';
 
@@ -16,23 +17,41 @@ import { normalizarContenido } from '@/lib/textoRico';
  * markdown ("# ", "> "…) ni al pegar contenido de otro lado. Sin imagen ni
  * video: eso ya lo resuelven los bloques de imagen/video.
  *
- * Guarda HTML (getHTML()) al perder el foco, igual que el textarea anterior;
- * un editor vacío guarda null. El contenido existente se carga normalizado:
- * los bloques viejos en texto plano se convierten a párrafos (ver
- * lib/textoRico.ts). Lo que se guarda se vuelve a sanitizar al renderizar.
+ * Listas SIN anidar (sin Tab para meter un ítem dentro de otro, y un ítem
+ * sólo admite párrafos): el CV y la declaración se paginan midiendo el alto
+ * del contenido, y las listas anidadas no son parte de los 5 botones.
+ *
+ * Devuelve HTML (getHTML()); un editor vacío da null. Dos formas de uso:
+ *   - onGuardar: se llama al perder el foco (bloques de obra, que persisten
+ *     cada campo al toque, igual que el textarea anterior).
+ *   - onCambio: se llama en cada cambio (form de contenido, que guarda todo
+ *     junto con su botón "Guardar").
+ * El contenido existente se carga normalizado: el texto plano viejo se
+ * convierte a párrafos (ver lib/textoRico.ts). Lo guardado se vuelve a
+ * sanitizar al renderizar.
  */
 export default function EditorTextoRico({
   valorInicial,
   onGuardar,
+  onCambio,
+  etiqueta = 'Texto del bloque',
+  placeholder = 'Texto del bloque…',
+  altoMinimo = 'min-h-[6rem]',
 }: {
   valorInicial: string | null;
-  onGuardar: (html: string | null) => void;
+  onGuardar?: (html: string | null) => void;
+  onCambio?: (html: string | null) => void;
+  etiqueta?: string;
+  placeholder?: string;
+  altoMinimo?: string;
 }) {
-  // El editor se crea una vez; el callback más reciente se lee por ref.
+  // El editor se crea una vez; los callbacks más recientes se leen por ref.
   const onGuardarRef = useRef(onGuardar);
+  const onCambioRef = useRef(onCambio);
   useEffect(() => {
     onGuardarRef.current = onGuardar;
-  }, [onGuardar]);
+    onCambioRef.current = onCambio;
+  }, [onGuardar, onCambio]);
 
   const editor = useEditor({
     // Next renderiza el panel en el servidor: sin esto Tiptap intenta montar
@@ -47,6 +66,7 @@ export default function EditorTextoRico({
         horizontalRule: false,
         strike: false,
         underline: false,
+        listItem: false, // reemplazado por ListaSinAnidar
         // Sin el <p></p> vacío que TrailingNode agrega siempre al final.
         trailingNode: false,
         link: {
@@ -58,20 +78,26 @@ export default function EditorTextoRico({
           HTMLAttributes: { target: null, rel: null },
         },
       }),
-      Placeholder.configure({ placeholder: 'Texto del bloque…' }),
+      ListaSinAnidar,
+      Placeholder.configure({ placeholder }),
     ],
     content: normalizarContenido(valorInicial),
     editorProps: {
       attributes: {
-        class: 'texto-rico min-h-[6rem] px-3 py-2 text-sm text-slate-800 leading-relaxed focus:outline-none',
-        'aria-label': 'Texto del bloque',
+        class: `texto-rico ${altoMinimo} px-3 py-2 text-sm text-slate-800 leading-relaxed focus:outline-none`,
+        'aria-label': etiqueta,
       },
     },
     onBlur: ({ editor }) => guardar(editor),
+    onUpdate: ({ editor }) => onCambioRef.current?.(valor(editor)),
   });
 
+  function valor(ed: Editor): string | null {
+    return ed.isEmpty ? null : ed.getHTML();
+  }
+
   function guardar(ed: Editor) {
-    onGuardarRef.current(ed.isEmpty ? null : ed.getHTML());
+    onGuardarRef.current?.(valor(ed));
   }
 
   const estado = useEditorState({
@@ -178,6 +204,21 @@ export default function EditorTextoRico({
     </div>
   );
 }
+
+/**
+ * Ítem de lista sin anidamiento: sólo párrafos adentro (una lista pegada
+ * dentro de otra se aplana) y sin el atajo Tab que mete un ítem dentro del
+ * anterior. Enter / Shift+Tab siguen como siempre.
+ */
+const ListaSinAnidar = ListItem.extend({
+  content: 'paragraph+',
+  addKeyboardShortcuts() {
+    return {
+      Enter: () => this.editor.commands.splitListItem(this.name),
+      'Shift-Tab': () => this.editor.commands.liftListItem(this.name),
+    };
+  },
+});
 
 function BotonFormato({
   etiqueta,

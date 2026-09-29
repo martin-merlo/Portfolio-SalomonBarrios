@@ -2,8 +2,10 @@ import sanitizeHtml from 'sanitize-html';
 import { normalizarContenido } from './textoRico';
 
 /**
- * Sanitiza el HTML de un bloque de texto de obra antes de renderizarlo (se
- * usa del lado del servidor, en la página de obra). Defensa contra XSS: el
+ * Sanitiza el HTML de los textos enriquecidos (bloques de texto de obra, Bio,
+ * CV y declaración del artista) antes de renderizarlo. SÓLO del lado del
+ * servidor: los componentes de cliente (CV y declaración, que paginan) reciben
+ * el HTML ya sanitizado por su padre server component. Defensa contra XSS: el
  * HTML viene de la base, así que no se confía en que lo haya generado el
  * editor — se permite SÓLO lo que producen los 5 botones del panel.
  *
@@ -42,7 +44,7 @@ const OPCIONES: sanitizeHtml.IOptions = {
   },
 };
 
-export function sanitizarHtmlBloque(contenido: string | null | undefined): string {
+export function sanitizarHtmlRico(contenido: string | null | undefined): string {
   return sanitizeHtml(normalizarContenido(contenido), OPCIONES);
 }
 

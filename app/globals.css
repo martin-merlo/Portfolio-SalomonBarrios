@@ -136,8 +136,15 @@ body {
 .texto-rico > * + * {
   margin-top: 1rem; /* = el space-y-4 que separaba los párrafos antes */
 }
+/* Negrita reforzada: la tipografía del cuerpo no tiene un bold que se note
+   (PS Pimpdeed II tiene un solo peso y el navegador lo sintetiza; mientras
+   falte el archivo, el fallback Courier New trae un bold muy fino). Un trazo
+   de 0.03em en el color del texto engrosa las letras de forma pareja: elegido
+   a ojo sobre render real a 1x y 2x — con 0.05em ya se cerraban los huecos de
+   letras como la "o"; con 0.02em casi no se diferenciaba del bold solo. */
 .texto-rico strong {
   font-weight: 700;
+  -webkit-text-stroke: 0.03em currentColor;
 }
 .texto-rico em {
   font-style: italic;
@@ -153,6 +160,16 @@ body {
 }
 .texto-rico li + li {
   margin-top: 0.35em;
+}
+/* CV y declaración (paginados): los párrafos se separan con una línea en
+   blanco (1lh = el interlineado), igual que el texto plano de antes. */
+.texto-rico--lineas > * + * {
+  margin-top: 1lh;
+}
+/* Continuación de un ítem de lista que la paginación partió entre dos
+   páginas (lib/paginarHtml.ts): sin viñeta/número repetido. */
+.texto-rico li.continua {
+  list-style-type: none;
 }
 .texto-rico li > p {
   margin: 0;

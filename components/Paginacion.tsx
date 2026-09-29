@@ -10,6 +10,7 @@ import type { RefObject } from 'react';
 
 interface PistaPaginasProps {
   contenedorRef: RefObject<HTMLDivElement | null>;
+  /** HTML de cada página, armado por lib/paginarHtml.ts (seguro por construcción). */
   paginas: string[];
   pagina: number;
   /** Clase tipográfica de cada página — la MISMA que se pasó al hook para medir. */
@@ -26,15 +27,16 @@ export function PistaPaginas({ contenedorRef, paginas, pagina, clase, alto }: Pi
         style={{ transform: `translateX(-${pagina * 100}%)` }}
       >
         {paginas.map((contenido, i) => (
+          // inert en las páginas ocultas: fuera de pantalla, sus links no
+          // tienen que recibir foco de teclado ni clicks.
           <div
             key={i}
             role="tabpanel"
             aria-hidden={i !== pagina}
+            inert={i !== pagina}
             className={`w-full h-full shrink-0 ${clase}`}
-            style={{ whiteSpace: 'pre-line' }}
-          >
-            {contenido}
-          </div>
+            dangerouslySetInnerHTML={{ __html: contenido }}
+          />
         ))}
       </div>
     </div>
