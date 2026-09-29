@@ -2,9 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { ImagenProceso } from '@/lib/tipos';
 import { fondoImagen } from '@/lib/imagen';
 import { MARGEN_PAPEL } from '@/lib/estilos';
+
+gsap.registerPlugin(ScrollTrigger);
 
 function Card({ item }: { item: ImagenProceso }) {
   return (
@@ -20,19 +23,46 @@ function Card({ item }: { item: ImagenProceso }) {
   );
 }
 
+// Segundos que tarda el auto-play en recorrer una tanda completa de items
+// (media tira) — misma velocidad que tenía el tween original.
+const SEGUNDOS_POR_ITEM = 5;
+// Cuánto del scroll se transmite al carrusel: px/s de carrusel por px/s de
+// scroll. 0.5 = el carrusel avanza a la mitad de la velocidad del scroll.
+const FACTOR_SCROLL = 0.5;
+// Tope del impulso (px/s) para que un flick muy fuerte no lo haga volar.
+const IMPULSO_MAX = 1800;
+// Constantes de tiempo (s) del suavizado exponencial. TAU_IMPULSO: cuánto
+// tarda en apagarse el empuje del scroll cuando el scroll se detiene.
+// TAU_VELOCIDAD: cuánto tarda la velocidad real en alcanzar la objetivo
+// (evita saltos al empezar/terminar el scroll y al entrar/salir el mouse).
+const TAU_IMPULSO = 0.35;
+const TAU_VELOCIDAD = 0.18;
+
 /**
- * Carrusel en loop continuo (auto-play). Sin prefers-reduced-motion: tira
- * duplicada + tween GSAP en xPercent de 0 a -50% (loop sin costuras), que se
- * recorre solo y se pausa con el mouse encima. Con reduced-motion: tira
- * simple, sin duplicar, con scroll horizontal nativo (sin loop ni auto-play).
+ * Carrusel en loop continuo (auto-play) sincronizado con el scroll.
  *
- * El arrastre manual (drag con pointer events) se quitó a pedido del cliente:
- * no funcionaba bien y la navegación queda cubierta por el auto-play + la
- * pausa al hover.
+ * Sin prefers-reduced-motion: tira duplicada + posición en xPercent envuelta
+ * en [0, -50%) — como las dos mitades son idénticas, el salto de -50% a 0 es
+ * invisible (loop sin costuras). En vez de un tween fijo, la posición se
+ * integra en el ticker de GSAP con una velocidad que es la suma de:
+ *   - el auto-play base (0 con el mouse encima: pausa al hover), y
+ *   - un impulso que viene del scroll: mientras la sección está en pantalla,
+ *     un ScrollTrigger lee la velocidad del scroll de la página; scrollear
+ *     hacia abajo adelanta el carrusel, hacia arriba lo hace retroceder.
+ * Cuando el scroll para, el impulso decae exponencialmente y la velocidad
+ * vuelve sola al auto-play, sin saltos. El impulso se aplica aun con el mouse
+ * encima: el carrusel ocupa todo el ancho, así que casi siempre se scrollea
+ * con el cursor sobre él.
+ *
+ * Con reduced-motion: tira simple, sin duplicar, con scroll horizontal nativo
+ * (sin loop, sin auto-play y sin sincronía con el scroll).
+ *
+ * El arrastre manual (drag con pointer events) se quitó a pedido del cliente.
  */
 export default function Proceso({ items }: { items: ImagenProceso[] }) {
+  const seccionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const tweenRef = useRef<gsap.core.Tween | null>(null);
+  const hoverRef = useRef(false);
   const [loopHabilitado, setLoopHabilitado] = useState(false);
 
   useEffect(() => {
@@ -42,27 +72,49 @@ export default function Proceso({ items }: { items: ImagenProceso[] }) {
   useEffect(() => {
     if (!loopHabilitado) return;
     const track = trackRef.current;
-    if (!track) return;
+    const seccion = seccionRef.current;
+    if (!track || !seccion) return;
 
-    const tween = gsap.to(track, {
-      xPercent: -50,
-      duration: items.length * 5,
-      ease: 'none',
-      repeat: -1,
+    const duracion = items.length * SEGUNDOS_POR_ITEM;
+    const setX = gsap.quickSetter(track, 'xPercent');
+    let mitadPx = track.offsetWidth / 2; // ancho de una tanda de items
+    let progreso = 0; // 0..1 dentro de la media tira
+    let velocidad = 0; // px/s reales (suavizados)
+    let impulso = 0; // px/s aportados por el scroll
+
+    const ro = new ResizeObserver(() => {
+      mitadPx = track.offsetWidth / 2;
     });
-    tweenRef.current = tween;
+    ro.observe(track);
+
+    const st = ScrollTrigger.create({
+      trigger: seccion,
+      start: 'top bottom',
+      end: 'bottom top',
+      onUpdate: (self) => {
+        impulso = gsap.utils.clamp(-IMPULSO_MAX, IMPULSO_MAX, self.getVelocity() * FACTOR_SCROLL);
+      },
+    });
+
+    function tick(_tiempo: number, deltaMs: number) {
+      if (mitadPx <= 0) return;
+      // Tope de dt: al volver de una pestaña oculta no pega un salto.
+      const dt = Math.min(deltaMs, 100) / 1000;
+      impulso *= Math.exp(-dt / TAU_IMPULSO);
+      const base = hoverRef.current ? 0 : mitadPx / duracion;
+      velocidad += (base + impulso - velocidad) * (1 - Math.exp(-dt / TAU_VELOCIDAD));
+      progreso = (((progreso + (velocidad * dt) / mitadPx) % 1) + 1) % 1;
+      setX(-50 * progreso);
+    }
+    gsap.ticker.add(tick);
 
     return () => {
-      tween.kill();
+      gsap.ticker.remove(tick);
+      st.kill();
+      ro.disconnect();
+      gsap.set(track, { clearProps: 'transform' });
     };
   }, [loopHabilitado, items.length]);
-
-  function pausar() {
-    tweenRef.current?.pause();
-  }
-  function reanudar() {
-    tweenRef.current?.play();
-  }
 
   if (!loopHabilitado) {
     return (
@@ -79,8 +131,12 @@ export default function Proceso({ items }: { items: ImagenProceso[] }) {
   const doble = [...items, ...items];
 
   return (
-    <section aria-label="Proceso de trabajo" className="overflow-hidden py-10 sm:py-16">
-      <div className="overflow-hidden" onMouseEnter={pausar} onMouseLeave={reanudar}>
+    <section ref={seccionRef} aria-label="Proceso de trabajo" className="overflow-hidden py-10 sm:py-16">
+      <div
+        className="overflow-hidden"
+        onMouseEnter={() => (hoverRef.current = true)}
+        onMouseLeave={() => (hoverRef.current = false)}
+      >
         <div ref={trackRef} className="flex w-max">
           {doble.map((item, i) => (
             <Card key={`${item.id}-${i}`} item={item} />

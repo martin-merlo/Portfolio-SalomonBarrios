@@ -1,7 +1,9 @@
 'use client';
 
+import { useRef } from 'react';
 import { MARGEN_PAPEL } from '@/lib/estilos';
 import { usePaginacion } from '@/lib/usePaginacion';
+import { useRuedaPaginas } from '@/lib/useRuedaPaginas';
 import SectionLabel from './SectionLabel';
 import { ControlesPaginas, PistaPaginas } from './Paginacion';
 
@@ -12,6 +14,10 @@ export default function Cav({ texto }: { texto: string }) {
     texto,
     CLASE_TEXTO_PAGINA,
   );
+  // Rueda del mouse encima del cuadro = pasar páginas (sin atrapar el scroll
+  // en la primera/última página; ver useRuedaPaginas).
+  const cajaRef = useRef<HTMLDivElement>(null);
+  useRuedaPaginas(cajaRef, pagina, total, setPagina);
 
   return (
     <section id="cav" className={`${MARGEN_PAPEL} pb-20 sm:pb-28`}>
@@ -26,7 +32,7 @@ export default function Cav({ texto }: { texto: string }) {
          * padding no puede ir en ese mismo div (las páginas quedarían más chicas
          * que lo medido y el texto se desbordaría).
          */}
-        <div className="bg-recuadro px-4 py-4 sm:px-7 sm:py-6">
+        <div ref={cajaRef} className="bg-recuadro px-4 py-4 sm:px-7 sm:py-6">
           <PistaPaginas
             contenedorRef={contenedorRef}
             paginas={paginas}
