@@ -51,7 +51,9 @@ interface Objetivo {
 // Desplazamiento máximo (px) de cada canal a intensidad plena y lejos del cursor.
 // Imágenes 1.6px: sobre obras con mucho detalle cada contorno se tiñe, así que
 // con más (se probó 2.2px) deja de ser un toque y pasa a efecto llamativo.
-const MAX_PX: Record<Tipo, number> = { imagen: 1.6, texto: 1.6 };
+// TEMPORAL — DIAGNÓSTICO: 18px exagerado sólo para confirmar que el efecto se
+// aplica. Volver a un valor razonable (antes 1.6) cuando se confirme.
+const MAX_PX: Record<Tipo, number> = { imagen: 18, texto: 18 };
 // Velocidad del mouse (px/s) a la que el efecto llega al 100%.
 const VELOCIDAD_PLENA = 1600;
 // Distancia (px) del cursor: por debajo de CERCA casi no hay efecto, a partir
