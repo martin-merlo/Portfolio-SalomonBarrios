@@ -14,10 +14,11 @@ import { ControlesPaginas, PistaPaginas } from './Paginacion';
 const ALTO_CAJA =
   'h-[max(24vh,min(30vh,calc(100vh_-_474px)))] md:h-[min(55vh,calc(100vh_-_340px))]';
 
-// Misma tipografía que tenía el párrafo de la declaración, + formato del editor
-// (texto-rico) con párrafos separados por una línea en blanco como antes.
+// Tipografía del cuerpo de la declaración: 2px más chica que la original
+// (12/14/16px, antes 14/16/18px) para que entre más texto por página. + formato
+// del editor (texto-rico) con párrafos separados por una línea en blanco.
 const CLASE_TEXTO =
-  'texto-rico texto-rico--lineas font-mono text-claro/85 text-sm sm:text-base lg:text-lg leading-relaxed text-left';
+  'texto-rico texto-rico--lineas font-mono text-claro/85 text-xs sm:text-sm lg:text-base leading-relaxed text-left';
 
 /**
  * Declaración del artista (bloque a la derecha del hero), paginada

@@ -18,8 +18,20 @@ const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 const ANCHO_BORDE = 'w-[56px] sm:w-[110px] lg:w-[160px]';
 const ALTO_TIRA = 'h-[56px] sm:h-[110px] lg:h-[160px]';
 
-// 0.45 bajado un 15% relativo (0.45 × 0.85 ≈ 0.38): más sutil, sigue visible.
-const OPACIDAD_BORDE = 0.38;
+// Historia: 0.45 → 0.38 → 0.28 (más sutil; elegido a ojo sobre el papel entre
+// 0.25 y 0.30: con 0.25 en las zonas claras del dibujo casi se perdía).
+const OPACIDAD_BORDE = 0.28;
+
+// Fade en el arranque (arriba): el borde aparece gradualmente en vez de nacer
+// con un corte seco. La máscara va en el contenedor exterior (fijo a la
+// sección), así no se mueve con el parallax de la tira de adentro. Sólo arriba.
+const ESTILO_CONTENEDOR = {
+  pointerEvents: 'none',
+  mixBlendMode: 'multiply',
+  opacity: OPACIDAD_BORDE,
+  maskImage: 'linear-gradient(to bottom, transparent 0, #000 clamp(160px, 28vh, 300px))',
+  WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, #000 clamp(160px, 28vh, 300px))',
+} as const;
 
 /**
  * Tira decorativa borde-ornamental.png (2080x500, dibujo en la mitad
@@ -151,7 +163,7 @@ export default function BordeOrnamental() {
         ref={izqOuterRef}
         aria-hidden="true"
         className={`absolute inset-y-0 left-0 overflow-hidden ${ANCHO_BORDE}`}
-        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: OPACIDAD_BORDE }}
+        style={ESTILO_CONTENEDOR}
       >
         <div
           ref={izqInnerRef}
@@ -169,7 +181,7 @@ export default function BordeOrnamental() {
         ref={derOuterRef}
         aria-hidden="true"
         className={`absolute inset-y-0 right-0 overflow-hidden ${ANCHO_BORDE}`}
-        style={{ pointerEvents: 'none', mixBlendMode: 'multiply', opacity: OPACIDAD_BORDE }}
+        style={ESTILO_CONTENEDOR}
       >
         <div
           ref={derInnerRef}
