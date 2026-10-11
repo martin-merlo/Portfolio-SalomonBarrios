@@ -26,11 +26,16 @@ export default async function Home() {
       <main>
         <Hero contenido={contenido} />
         <PaperSurface>
+          {/* Mismo orden que el navbar (BIO · WORK · CONTACTO · CV) y que la
+              numeración de los labels (bio.1, work.2, Contacto.3, CV.4). El
+              carrusel de proceso va pegado al CV, justo antes: sigue entre
+              Contacto y CV como cuando el orden era CV → proceso → contacto,
+              y el CV queda como cierre de la página. */}
           <Bio texto={contenido.bioTexto} />
           <Work obras={obras} />
-          <Cav html={sanitizarHtmlRico(contenido.cvTexto)} />
-          <Proceso items={proceso} />
           <Contacto contenido={contenido} />
+          <Proceso items={proceso} />
+          <Cav html={sanitizarHtmlRico(contenido.cvTexto)} />
         </PaperSurface>
       </main>
     </>

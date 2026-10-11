@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 interface SectionLabelProps {
   texto: string;
   /**
-   * Punto de entrada oculto al panel: sólo Contacto.tsx (Contactame.4) lo
+   * Punto de entrada oculto al panel: sólo Contacto.tsx (Contacto.3) lo
    * pasa en true. El "~" sigue viéndose exactamente igual — un botón, no un
    * <a> (nada de href rastreable), con el área clickeable ampliada vía
    * padding + margen negativo para no mover el layout ni cambiar cómo se ve.

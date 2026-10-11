@@ -33,9 +33,9 @@ function IconoTikTok() {
 
 export default function Contacto({ contenido }: { contenido: ContenidoSitio }) {
   return (
-    <section id="contacto" className={`${MARGEN_PAPEL} pb-24 sm:pb-32`}>
+    <section id="contacto" className={`${MARGEN_PAPEL} scroll-mt-16 sm:scroll-mt-[72px] pb-20 sm:pb-28`}>
       <div className="max-w-[1500px] mx-auto">
-        <SectionLabel texto="Contactame.4" entradaPanel />
+        <SectionLabel texto="Contacto.3" entradaPanel />
 
         <div className="flex flex-col items-center text-center gap-5 sm:gap-6 py-6 sm:py-10">
           <a
@@ -72,7 +72,13 @@ export default function Contacto({ contenido }: { contenido: ContenidoSitio }) {
             </a>
           </div>
 
-          <div className="mt-10 sm:mt-16">
+          {/* -mb: firma.png es un cuadrado con el trazo centrado y un 32% de su
+              alto transparente DEBAJO del trazo (346 de 1080px) — 90px a 280px
+              de ancho, 115px a 360px. Cuando la firma cerraba la página ese aire
+              no se notaba; desde que Contacto va antes del carrusel y el CV,
+              dejaba un hueco de papel vacío. Se compensa para que el espacio
+              hasta el carrusel sea el margen normal entre secciones. */}
+          <div className="mt-10 sm:mt-16 -mb-[90px] sm:-mb-[115px]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/imagenes/firma.png"

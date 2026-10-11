@@ -9,8 +9,8 @@ gsap.registerPlugin(ScrollTrigger);
 const ITEMS = [
   { label: 'BIO', href: '#bio' },
   { label: 'WORK', href: '#work' },
+  { label: 'CONTACTO', href: '#contacto' },
   { label: 'CV', href: '#cav' },
-  { label: 'SOCIALS', href: '#contacto' },
 ];
 
 const BREAKPOINT_MOBILE = '(max-width: 767px)';
@@ -226,7 +226,10 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
       >
         {heroTitulo}
       </span>
-      <ul className="relative z-10 flex gap-2 sm:gap-6 lg:gap-8 font-mono font-bold uppercase text-xs sm:text-base lg:text-lg tracking-wide text-claro shrink-0">
+      {/* Mobile: gap-1.5 + tracking normal (y 11px por debajo de 360px) para que
+          BIO · WORK · CONTACTO · CV entre en una fila junto al nombre aun a
+          320px; desde sm: los mismos valores de siempre. */}
+      <ul className="relative z-10 flex gap-1.5 sm:gap-6 lg:gap-8 font-mono font-bold uppercase text-[11px] min-[360px]:text-xs sm:text-base lg:text-lg tracking-normal sm:tracking-wide text-claro shrink-0">
         {ITEMS.map((item) => (
           <li key={item.label}>
             <a href={item.href} className="hover:opacity-70 transition-opacity">

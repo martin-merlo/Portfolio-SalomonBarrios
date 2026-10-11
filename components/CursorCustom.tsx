@@ -137,7 +137,7 @@ function Cursor({ reducido }: { reducido: boolean }) {
         return;
       }
       // data-cursor-ignore: clickeable a propósito "invisible" (el acceso oculto
-      // al panel en Contactame.4) — el círculo no se agranda para no delatarlo.
+      // al panel en Contacto.3) — el círculo no se agranda para no delatarlo.
       const clickeable = el?.closest(CLICKEABLE);
       setClickeable(!!clickeable && !clickeable.closest('[data-cursor-ignore]'));
     }

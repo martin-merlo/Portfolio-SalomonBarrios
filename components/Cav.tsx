@@ -24,9 +24,9 @@ export default function Cav({ html }: { html: string }) {
   useRuedaPaginas(cajaRef, pagina, total, setPagina);
 
   return (
-    <section id="cav" className={`${MARGEN_PAPEL} pb-20 sm:pb-28`}>
+    <section id="cav" className={`${MARGEN_PAPEL} scroll-mt-16 sm:scroll-mt-[72px] pb-24 sm:pb-32`}>
       <div className="max-w-[1500px] mx-auto">
-        <SectionLabel texto="CV.3" />
+        <SectionLabel texto="CV.4" />
 
         {/*
          * Cuadro de color sólido (token recuadro = claro, #F7F6F2, con sombra sutil) detrás del texto,
