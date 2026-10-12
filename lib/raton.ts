@@ -11,6 +11,10 @@
  *   ninguno lo necesita — en reposo no corre nada.
  * - Los listeners del document se ponen con el primer suscriptor y se sacan
  *   con el último.
+ * - Un listener de scroll (no de mouse) sólo DESPIERTA el loop: con el mouse
+ *   quieto la página puede moverse por debajo del cursor, y los efectos que
+ *   dependen de "qué hay bajo el puntero" (la zona limpia de la aberración)
+ *   tienen que recalcularse aunque el mouse no se haya movido.
  */
 
 export interface EstadoRaton {
@@ -89,6 +93,7 @@ export function suscribirRaton(s: SuscriptorRaton): () => void {
     document.addEventListener('mousemove', onMove, { passive: true });
     document.addEventListener('mouseout', onOut, { passive: true });
     window.addEventListener('blur', onSalir);
+    window.addEventListener('scroll', despertar, { passive: true });
   }
   suscriptores.add(s);
   return () => {
@@ -97,6 +102,7 @@ export function suscribirRaton(s: SuscriptorRaton): () => void {
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseout', onOut);
       window.removeEventListener('blur', onSalir);
+      window.removeEventListener('scroll', despertar);
       cancelAnimationFrame(raf);
       raf = 0;
       estado.dentro = false;

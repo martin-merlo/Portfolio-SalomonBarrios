@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { cousine, sekuya } from '@/lib/fonts';
-import AberracionCromatica from '@/components/AberracionCromatica';
+import EfectosVisuales from '@/components/EfectosVisuales';
 import CursorCustom from '@/components/CursorCustom';
 import './globals.css';
 
@@ -18,11 +18,11 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${sekuya.variable} ${cousine.variable} bg-papel text-tinta antialiased`}>
         {children}
-        {/* Los dos se autodescartan en /panel y en dispositivos sin mouse real
-            (la aberración también con prefers-reduced-motion). Comparten el
-            mismo origen del mouse: lib/raton.ts. */}
+        {/* Cursor y efectos se autodescartan en /panel y en dispositivos sin
+            mouse real; cada efecto tiene su interruptor en lib/efectos.ts.
+            Comparten el mismo origen del mouse: lib/raton.ts. */}
         <CursorCustom />
-        <AberracionCromatica />
+        <EfectosVisuales />
       </body>
     </html>
   );

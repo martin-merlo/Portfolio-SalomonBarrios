@@ -12,9 +12,11 @@ gsap.registerPlugin(ScrollTrigger);
 function Card({ item }: { item: ImagenProceso }) {
   return (
     <div className="relative w-[220px] h-[280px] sm:w-[280px] sm:h-[340px] shrink-0 mx-2 sm:mx-3 overflow-hidden rounded-sm shadow-sutil">
-      {/* data-aberracion en la imagen sola, nunca en el texto de abajo. */}
+      {/* Sin data-aberracion a propósito: el carrusel se mueve todo el tiempo
+          (la zona limpia del cursor se "corría" con las imágenes) y duplica
+          sus cards para el loop, así que eran 12 de las 16 copias filtradas —
+          lo que más pesaba de la aberración. Medido en EfectosVisuales. */}
       <div
-        data-aberracion="imagen"
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: fondoImagen(item.imagenUrl) }}
       />

@@ -205,11 +205,63 @@ html.cursor-custom * {
   cursor: none !important;
 }
 
-/* Aberración cromática en títulos grandes (components/AberracionCromatica.tsx):
-   separación rojo/cian con text-shadow, sólo mientras el efecto está activo
-   (el atributo lo pone/saca el componente; en reposo no hay text-shadow). */
-[data-aberracion='texto'][data-aberracion-activa] {
+/* ---------------------------------------------------------------------
+ * Capa de efectos visuales (components/EfectosVisuales.tsx). Cada efecto se
+ * prende/apaga por separado en lib/efectos.ts.
+ * ------------------------------------------------------------------- */
+
+/* Aberración en títulos grandes: halo rojo/cian difuminado; --ab-t (px) lo
+   escribe AberracionCromatica según la distancia del cursor (0 encima del
+   título, pleno lejos). La alfa acompaña a la separación: con --ab-t = 0 no
+   queda ningún resplandor. Sólo mientras el efecto está montado. */
+html.aberracion-activa [data-aberracion='texto'] {
   text-shadow:
-    calc(var(--ab-x, 0) * 1px) calc(var(--ab-y, 0) * 1px) 0 rgb(255 30 70 / 0.55),
-    calc(var(--ab-x, 0) * -1px) calc(var(--ab-y, 0) * -1px) 0 rgb(0 215 255 / 0.55);
+    calc(var(--ab-t, 0) * 1px) 0 3px rgb(255 40 80 / calc(var(--ab-t, 0) * 0.3)),
+    calc(var(--ab-t, 0) * -1px) 0 3px rgb(0 210 255 / calc(var(--ab-t, 0) * 0.3));
+}
+
+/* Grano de película: textura FIJA (public/imagenes/grano.png, 256px, generada
+   una sola vez) en una capa un tile más grande que la pantalla, que salta de
+   posición con transform en pasos (steps) — nada de regenerar ruido, y
+   transform lo mueve el compositor sin repintar. ~10 cuadros/s, como grano. */
+.efecto-grano {
+  position: fixed;
+  top: -256px;
+  left: -256px;
+  right: 0;
+  bottom: 0;
+  z-index: 9000;
+  pointer-events: none;
+  background-image: url('/imagenes/grano.png');
+  background-repeat: repeat;
+  opacity: 0.05;
+  will-change: transform;
+  animation: grano 0.8s steps(1, end) infinite;
+}
+@keyframes grano {
+  0% { transform: translate3d(0, 0, 0); }
+  12.5% { transform: translate3d(97px, 211px, 0); }
+  25% { transform: translate3d(183px, 41px, 0); }
+  37.5% { transform: translate3d(29px, 139px, 0); }
+  50% { transform: translate3d(227px, 173px, 0); }
+  62.5% { transform: translate3d(61px, 17px, 0); }
+  75% { transform: translate3d(149px, 239px, 0); }
+  87.5% { transform: translate3d(211px, 103px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* Scanlines CRT: sólo líneas horizontales finas (1px oscura cada 3px) al ~5%.
+   Estáticas: sin curvado, sin flicker, sin JS. */
+.efecto-scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 9001;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgb(0 0 20 / 0.05) 0,
+    rgb(0 0 20 / 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
 }
