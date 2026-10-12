@@ -27,6 +27,14 @@ import { suscribirRaton } from '@/lib/raton';
  *
  * Nunca sobre texto de lectura: sólo lo marcado explícitamente.
  *
+ * Alcance por página (lo decide quién marca, no este componente):
+ *   - Home: obras de la galería (ObraCard) y título grande del hero.
+ *   - Páginas de obra: SÓLO el título grande (ObraHero). Ninguna imagen —
+ *     ni el fondo del hero de la obra ni los bloques de imagen —: ahí se va
+ *     a ver la obra en detalle. No marcar imágenes en componentes de /obra.
+ *   Al navegar entre páginas, las copias de los elementos que se van se
+ *   eliminan solas (escanear() en el MutationObserver).
+ *
  * Mouse: no hay listener propio; se suscribe al store compartido lib/raton.ts
  * (el mismo del cursor custom), que además se despierta con el scroll. Con el
  * mouse y la página quietos no corre nada. Contenido dinámico (obras/bloques

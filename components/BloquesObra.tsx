@@ -95,9 +95,10 @@ function BloqueTexto({ titulo, contenido }: { titulo: string | null; contenido: 
 
 function BloqueImagen({ url, tamano }: { url: string; tamano: TamanoBloque }) {
   return (
-    // data-aberracion en el wrapper: la <img> ya ocupa `filter` con su
-    // drop-shadow, y un filtro inline lo pisaría.
-    <div data-aberracion="imagen" className={`mx-auto ${ANCHO_BLOQUE[tamano]}`}>
+    // SIN data-aberracion a propósito: en la página de obra el visitante vino a
+    // ver la obra en detalle y la aberración estorba. Ahí sólo la lleva el
+    // título grande (ObraHero). Ver AberracionCromatica.
+    <div className={`mx-auto ${ANCHO_BLOQUE[tamano]}`}>
       {/* width/height son sólo la relación por defecto para reservar espacio;
           w-full h-auto la muestra responsive respetando el alto real. next/image
           la optimiza (resize + formato) igual. Sombra con drop-shadow (no
