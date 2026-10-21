@@ -1,5 +1,6 @@
 'use client';
 
+import { textos, type Idioma } from '@/lib/i18n';
 import type { RefObject } from 'react';
 
 /**
@@ -72,6 +73,8 @@ interface ControlesPaginasProps {
   tono: keyof typeof TONOS;
   /** aria-label del grupo de indicadores, p. ej. "Páginas del CV". */
   etiqueta: string;
+  /** Idioma de los aria-label de flechas y puntos. */
+  idioma: Idioma;
   className?: string;
 }
 
@@ -82,12 +85,14 @@ export function ControlesPaginas({
   onElegir,
   tono,
   etiqueta,
+  idioma,
   className = '',
 }: ControlesPaginasProps) {
   const t = TONOS[tono];
+  const tx = textos(idioma);
   return (
     <div className={`flex items-center gap-2 sm:gap-3 ${className}`}>
-      <button type="button" onClick={() => onIr(-1)} aria-label="Página anterior" className={t.flecha}>
+      <button type="button" onClick={() => onIr(-1)} aria-label={tx.paginaAnterior} className={t.flecha}>
         ‹
       </button>
 
@@ -98,7 +103,7 @@ export function ControlesPaginas({
             type="button"
             role="tab"
             aria-selected={i === pagina}
-            aria-label={`Página ${i + 1}`}
+            aria-label={`${tx.pagina} ${i + 1}`}
             onClick={() => onElegir(i)}
             className={`${t.punto} rounded-full border transition-colors ${
               i === pagina ? t.activo : t.inactivo
@@ -107,7 +112,7 @@ export function ControlesPaginas({
         ))}
       </div>
 
-      <button type="button" onClick={() => onIr(1)} aria-label="Página siguiente" className={t.flecha}>
+      <button type="button" onClick={() => onIr(1)} aria-label={tx.paginaSiguiente} className={t.flecha}>
         ›
       </button>
     </div>

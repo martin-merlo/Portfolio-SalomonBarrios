@@ -7,7 +7,7 @@ import type { BloqueRow } from '@/lib/mapeo';
 import type { Bloque, TamanoBloque, TipoBloque } from '@/lib/tipos';
 import SubidaImagen from './SubidaImagen';
 import ListaOrdenable from './ListaOrdenable';
-import EditorTextoRico from './EditorTextoRico';
+import CampoBilingue from './CampoBilingue';
 
 // Mismos 3 botones visuales y vocabulario que el tamaño de grilla de las obras
 // del home (chica / normal / banner). Sólo para bloques de imagen.
@@ -27,8 +27,9 @@ const TIPOS: { valor: TipoBloque; etiqueta: string }[] = [
 ];
 
 // Columnas explícitas para no depender del orden de select('*').
-const COLS =
-  'id, obra_id, tipo, orden, contenido, titulo, imagen_url, tamano, video_url, video_ancho';
+// Todas las columnas: incluye las de inglés (titulo_en, contenido_en) cuando
+// ya se corrió la migración 0004, sin romper si todavía no.
+const COLS = '*';
 
 /** Acepta sólo links de YouTube o Vimeo (con o sin www, youtu.be, player.vimeo.com). */
 function esUrlVideoValida(url: string): boolean {
@@ -216,23 +217,30 @@ export default function ObraBloques({ obraId }: { obraId: string }) {
                 </div>
 
                 {b.tipo === 'texto' && (
-                  <div className="space-y-2">
-                    <input
-                      type="text"
-                      value={b.titulo ?? ''}
-                      onChange={(e) => setCampo(b.id, { titulo: e.target.value })}
-                      onBlur={() => persistir(b.id, { titulo: (b.titulo ?? '').trim() || null })}
+                  <div className="space-y-3">
+                    {/* Título y texto en español e inglés; cada uno se guarda al
+                        perder el foco (y el inglés también al traducirlo). */}
+                    <CampoBilingue
+                      etiqueta="Título del bloque"
+                      tipo="linea"
                       placeholder="Título del bloque (opcional)"
-                      className="w-full rounded border border-slate-300 px-3 py-2 text-sm font-medium"
+                      es={b.titulo ?? ''}
+                      en={b.tituloEn ?? ''}
+                      onCambio={(idioma, v) => setCampo(b.id, idioma === 'es' ? { titulo: v } : { tituloEn: v })}
+                      onGuardar={(idioma, v) =>
+                        persistir(b.id, idioma === 'es' ? { titulo: v.trim() || null } : { titulo_en: v.trim() || null })
+                      }
                     />
-                    {/* Rich text (Tiptap): guarda HTML al perder el foco. El
-                        título de arriba sigue siendo un input aparte. */}
-                    <EditorTextoRico
-                      valorInicial={b.contenido}
-                      onGuardar={(html) => {
-                        setCampo(b.id, { contenido: html });
-                        persistir(b.id, { contenido: html });
-                      }}
+                    <CampoBilingue
+                      etiqueta="Texto del bloque"
+                      tipo="rico"
+                      placeholder="Texto del bloque…"
+                      es={b.contenido ?? ''}
+                      en={b.contenidoEn ?? ''}
+                      onCambio={(idioma, v) => setCampo(b.id, idioma === 'es' ? { contenido: v || null } : { contenidoEn: v || null })}
+                      onGuardar={(idioma, v) =>
+                        persistir(b.id, idioma === 'es' ? { contenido: v || null } : { contenido_en: v || null })
+                      }
                     />
                   </div>
                 )}

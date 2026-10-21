@@ -1,7 +1,9 @@
 import { createPublicClient } from './supabase/publico';
 import { CLAVES_CONTENIDO, mapBloque, mapObra, mapProceso } from './mapeo';
-import type { Bloque, ContenidoSitio, ImagenProceso, Obra } from './tipos';
+import type { Bloque, ContenidoSitio, ContenidoSitioEn, ImagenProceso, Obra } from './tipos';
+import { CAMPOS_CONTENIDO_TRADUCIBLES } from './tipos';
 import type { BloqueRow, ObraRow, ProcesoRow } from './mapeo';
+import { localizarContenido, type Idioma } from './i18n';
 
 export async function getObras(): Promise<Obra[]> {
   const supabase = createPublicClient();
@@ -81,22 +83,33 @@ export async function getProceso(): Promise<ImagenProceso[]> {
  * como el objeto plano que espera el resto de la app; las claves ausentes
  * (contenido que el artista todavía no cargó desde el panel) caen a ''.
  */
-export async function getContenido(): Promise<ContenidoSitio> {
+export async function getContenidoCompleto(): Promise<{ es: ContenidoSitio; en: ContenidoSitioEn }> {
   const supabase = createPublicClient();
-  const { data, error } = await supabase.from('contenido_sitio').select('clave, valor');
+  // select('*'): valor_en (migración 0004) aparece sólo si ya existe la columna.
+  const { data, error } = await supabase.from('contenido_sitio').select('*');
 
-  const porClave = new Map<string, string>();
+  const porClave = new Map<string, { valor: string; valorEn: string }>();
   if (error) {
     console.error('Error al cargar contenido_sitio desde Supabase:', error.message);
   } else {
-    for (const fila of data as { clave: string; valor: string | null }[]) {
-      porClave.set(fila.clave, fila.valor ?? '');
+    for (const fila of data as { clave: string; valor: string | null; valor_en?: string | null }[]) {
+      porClave.set(fila.clave, { valor: fila.valor ?? '', valorEn: fila.valor_en ?? '' });
     }
   }
 
-  const contenido = {} as ContenidoSitio;
+  const es = {} as ContenidoSitio;
   for (const campo of Object.keys(CLAVES_CONTENIDO) as (keyof ContenidoSitio)[]) {
-    contenido[campo] = porClave.get(CLAVES_CONTENIDO[campo]) ?? '';
+    es[campo] = porClave.get(CLAVES_CONTENIDO[campo])?.valor ?? '';
   }
-  return contenido;
+  const en = {} as ContenidoSitioEn;
+  for (const campo of CAMPOS_CONTENIDO_TRADUCIBLES) {
+    en[campo] = porClave.get(CLAVES_CONTENIDO[campo])?.valorEn ?? '';
+  }
+  return { es, en };
+}
+
+/** Contenido en el idioma pedido (lo que falte en inglés cae al español). */
+export async function getContenido(idioma: Idioma = 'es'): Promise<ContenidoSitio> {
+  const { es, en } = await getContenidoCompleto();
+  return localizarContenido(es, en, idioma);
 }

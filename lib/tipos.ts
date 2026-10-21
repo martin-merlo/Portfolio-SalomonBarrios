@@ -18,6 +18,11 @@ export interface Obra {
   // Subtítulo de la página individual (encabezado de la sección de contenido
   // extendido, arriba de los bloques). Se queda como campo fijo.
   subtituloExtendido: string | null;
+  // Versión en inglés (toggle ES/EN). null/vacío = se muestra el español.
+  tituloEn: string | null;
+  tecnicaEn: string | null;
+  descripcionEn: string | null;
+  subtituloExtendidoEn: string | null;
 }
 
 export type TipoBloque = 'texto' | 'imagen' | 'video';
@@ -45,6 +50,9 @@ export interface Bloque {
   tamano: TamanoBloque | null;
   videoUrl: string | null;
   videoAncho: number | null;
+  // Versión en inglés (sólo bloques de texto). null/vacío = español.
+  tituloEn: string | null;
+  contenidoEn: string | null;
 }
 
 export interface ImagenProceso {
@@ -52,6 +60,8 @@ export interface ImagenProceso {
   imagenUrl: string;
   textoCorto: string;
   orden: number;
+  /** Versión en inglés del texto corto. null/vacío = español. */
+  textoCortoEn: string | null;
 }
 
 export interface ContenidoSitio {
@@ -67,3 +77,18 @@ export interface ContenidoSitio {
   instagramUrl: string;
   tiktokUrl: string;
 }
+
+/**
+ * Campos de ContenidoSitio que tienen versión en inglés (columna valor_en de
+ * contenido_sitio). El resto (nombre, imagen, contacto, redes) no se traduce.
+ */
+export const CAMPOS_CONTENIDO_TRADUCIBLES = [
+  'heroSubtitulo',
+  'declaracionTitulo',
+  'declaracionTexto',
+  'bioTexto',
+  'cvTexto',
+] as const;
+export type CampoContenidoTraducible = (typeof CAMPOS_CONTENIDO_TRADUCIBLES)[number];
+/** Versión en inglés de los campos traducibles ('' = sin traducir todavía). */
+export type ContenidoSitioEn = Record<CampoContenidoTraducible, string>;

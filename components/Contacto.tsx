@@ -1,3 +1,4 @@
+import { textos, type Idioma } from '@/lib/i18n';
 import type { ContenidoSitio } from '@/lib/tipos';
 import { MARGEN_PAPEL } from '@/lib/estilos';
 import SectionLabel from './SectionLabel';
@@ -31,11 +32,12 @@ function IconoTikTok() {
   );
 }
 
-export default function Contacto({ contenido }: { contenido: ContenidoSitio }) {
+export default function Contacto({ contenido, idioma }: { contenido: ContenidoSitio; idioma: Idioma }) {
+  const tx = textos(idioma);
   return (
     <section id="contacto" className={`${MARGEN_PAPEL} scroll-mt-16 sm:scroll-mt-[72px] pb-20 sm:pb-28`}>
       <div className="max-w-[1500px] mx-auto">
-        <SectionLabel texto="Contacto.3" entradaPanel />
+        <SectionLabel texto={tx.labels.contacto} entradaPanel />
 
         <div className="flex flex-col items-center text-center gap-5 sm:gap-6 py-6 sm:py-10">
           <a
@@ -82,7 +84,7 @@ export default function Contacto({ contenido }: { contenido: ContenidoSitio }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/imagenes/firma.png"
-              alt="Firma de Salomón Barrios"
+              alt={tx.firma}
               width={360}
               height={360}
               className="w-[280px] sm:w-[360px] h-auto"

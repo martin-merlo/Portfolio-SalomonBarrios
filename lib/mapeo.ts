@@ -22,6 +22,11 @@ export type ObraRow = {
   tiene_pagina_propia: boolean;
   publicada: boolean;
   subtitulo_extendido: string | null;
+  // Inglés (migración 0004). Opcionales: antes de correr la migración no vienen.
+  titulo_en?: string | null;
+  tecnica_en?: string | null;
+  descripcion_en?: string | null;
+  subtitulo_extendido_en?: string | null;
   // texto_extendido y obra_imagenes se retiraron (los reemplazan obra_bloques):
   // la columna texto_extendido puede seguir en la base sin uso, pero el código
   // ya no la mapea.
@@ -32,6 +37,7 @@ export type ProcesoRow = {
   imagen_url: string;
   texto_corto: string;
   orden: number;
+  texto_corto_en?: string | null;
 };
 
 export type BloqueRow = {
@@ -45,6 +51,8 @@ export type BloqueRow = {
   tamano: Bloque['tamano'];
   video_url: string | null;
   video_ancho: number | null;
+  titulo_en?: string | null;
+  contenido_en?: string | null;
 };
 
 export function mapObra(row: ObraRow): Obra {
@@ -64,6 +72,10 @@ export function mapObra(row: ObraRow): Obra {
     tienePaginaPropia: row.tiene_pagina_propia,
     publicada: row.publicada,
     subtituloExtendido: row.subtitulo_extendido,
+    tituloEn: row.titulo_en ?? null,
+    tecnicaEn: row.tecnica_en ?? null,
+    descripcionEn: row.descripcion_en ?? null,
+    subtituloExtendidoEn: row.subtitulo_extendido_en ?? null,
   };
 }
 
@@ -73,6 +85,7 @@ export function mapProceso(row: ProcesoRow): ImagenProceso {
     imagenUrl: row.imagen_url,
     textoCorto: row.texto_corto,
     orden: row.orden,
+    textoCortoEn: row.texto_corto_en ?? null,
   };
 }
 
@@ -88,6 +101,8 @@ export function mapBloque(row: BloqueRow): Bloque {
     tamano: row.tamano,
     videoUrl: row.video_url,
     videoAncho: row.video_ancho,
+    tituloEn: row.titulo_en ?? null,
+    contenidoEn: row.contenido_en ?? null,
   };
 }
 

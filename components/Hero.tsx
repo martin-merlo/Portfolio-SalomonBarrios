@@ -1,13 +1,15 @@
+import type { Idioma } from '@/lib/i18n';
 import type { ContenidoSitio } from '@/lib/tipos';
 import { fondoImagen } from '@/lib/imagen';
 import { sanitizarHtmlRico } from '@/lib/sanitizarHtml';
 import DeclaracionPaginada from './DeclaracionPaginada';
 
-export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
+export default function Hero({ contenido, idioma }: { contenido: ContenidoSitio; idioma: Idioma }) {
   return (
     <>
       <section
         id="hero"
+        data-protegida
         className="sticky top-0 z-0 w-full overflow-hidden bg-tinta"
         style={{
           height: 'calc(100vh - 100px)',
@@ -56,7 +58,13 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
         className="sticky top-0 z-20 motion-reduce:z-0 w-full overflow-hidden pointer-events-none"
         style={{ height: 'calc(100vh - 100px)', marginTop: 'calc(-1 * (100vh - 100px))' }}
       >
-        <div className="h-full px-5 sm:px-10 lg:px-14 pt-16 md:pt-0 flex flex-col justify-center gap-10 md:flex-row md:items-center md:justify-between md:gap-12">
+        {/* Mobile/tablet chico (< md): columna que arranca debajo del navbar y
+            del toggle de idioma (pt-[108px]) y deja abajo el alto de la ola del
+            papel (pb = 19.6vw, su pico, + aire); la declaración ocupa el alto
+            que sobra (ver DeclaracionPaginada). Así nada se pisa aunque el
+            subtítulo ocupe varias líneas o la pantalla sea baja. Desde md: fila
+            centrada, como siempre. */}
+        <div className="h-full px-5 sm:px-10 lg:px-14 pt-[108px] sm:pt-[124px] pb-[calc(19.6vw+14px)] md:pt-0 md:pb-0 flex flex-col justify-start gap-6 [@media(max-height:700px)]:gap-4 sm:gap-8 md:flex-row md:items-center md:justify-between md:gap-12">
           {/*
             Posición del título: prioriza la COMPOSICIÓN en reposo (como en
             referencia/diseño.pdf, donde el título arranca a ~12% del ancho) por
@@ -93,7 +101,7 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
             <h1
               id="hero-title"
               data-aberracion="texto"
-              className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]"
+              className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] [@media(max-height:700px)]:text-[10.5vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]"
               style={{ transformOrigin: 'left center', position: 'relative' }}
             >
               {contenido.heroTitulo}
@@ -112,6 +120,7 @@ export default function Hero({ contenido }: { contenido: ContenidoSitio }) {
           <DeclaracionPaginada
             titulo={contenido.declaracionTitulo}
             html={sanitizarHtmlRico(contenido.declaracionTexto)}
+            idioma={idioma}
           />
         </div>
       </div>

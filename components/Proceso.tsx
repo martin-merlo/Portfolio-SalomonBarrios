@@ -1,5 +1,6 @@
 'use client';
 
+import { textos, type Idioma } from '@/lib/i18n';
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -11,7 +12,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 function Card({ item }: { item: ImagenProceso }) {
   return (
-    <div className="relative w-[220px] h-[280px] sm:w-[280px] sm:h-[340px] shrink-0 mx-2 sm:mx-3 overflow-hidden rounded-sm shadow-sutil">
+    <div data-protegida className="relative w-[220px] h-[280px] sm:w-[280px] sm:h-[340px] shrink-0 mx-2 sm:mx-3 overflow-hidden rounded-sm shadow-sutil">
       {/* Sin data-aberracion a propósito: el carrusel se mueve todo el tiempo
           (la zona limpia del cursor se "corría" con las imágenes) y duplica
           sus cards para el loop, así que eran 12 de las 16 copias filtradas —
@@ -63,7 +64,8 @@ const TAU_VELOCIDAD = 0.18;
  *
  * El arrastre manual (drag con pointer events) se quitó a pedido del cliente.
  */
-export default function Proceso({ items }: { items: ImagenProceso[] }) {
+export default function Proceso({ items, idioma }: { items: ImagenProceso[]; idioma: Idioma }) {
+  const etiqueta = textos(idioma).procesoDeTrabajo;
   const seccionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const hoverRef = useRef(false);
@@ -122,7 +124,7 @@ export default function Proceso({ items }: { items: ImagenProceso[] }) {
 
   if (!loopHabilitado) {
     return (
-      <section aria-label="Proceso de trabajo" className="py-10 sm:py-16">
+      <section aria-label={etiqueta} className="py-10 sm:py-16">
         <div className={`flex overflow-x-auto py-5 -my-5 ${MARGEN_PAPEL}`}>
           {items.map((item) => (
             <Card key={item.id} item={item} />
@@ -135,7 +137,7 @@ export default function Proceso({ items }: { items: ImagenProceso[] }) {
   const doble = [...items, ...items];
 
   return (
-    <section ref={seccionRef} aria-label="Proceso de trabajo" className="overflow-hidden py-10 sm:py-16">
+    <section ref={seccionRef} aria-label={etiqueta} className="overflow-hidden py-10 sm:py-16">
       {/* py-5 -my-5: aire para que overflow-hidden no corte la sombra de las
           cards arriba/abajo, sin cambiar el alto que ocupa la sección. */}
       <div

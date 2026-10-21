@@ -1,3 +1,4 @@
+import { textos, type Idioma } from '@/lib/i18n';
 import Image from 'next/image';
 import type { Bloque, TamanoBloque } from '@/lib/tipos';
 import { htmlVacio, sanitizarHtmlRico } from '@/lib/sanitizarHtml';
@@ -98,7 +99,9 @@ function BloqueImagen({ url, tamano }: { url: string; tamano: TamanoBloque }) {
     // SIN data-aberracion a propósito: en la página de obra el visitante vino a
     // ver la obra en detalle y la aberración estorba. Ahí sólo la lleva el
     // título grande (ObraHero). Ver AberracionCromatica.
-    <div className={`mx-auto ${ANCHO_BLOQUE[tamano]}`}>
+    // data-protegida: sin clic derecho → "Guardar imagen" ni arrastre (ver
+    // ProtegerObras).
+    <div data-protegida className={`mx-auto ${ANCHO_BLOQUE[tamano]}`}>
       {/* width/height son sólo la relación por defecto para reservar espacio;
           w-full h-auto la muestra responsive respetando el alto real. next/image
           la optimiza (resize + formato) igual. Sombra con drop-shadow (no
@@ -110,12 +113,13 @@ function BloqueImagen({ url, tamano }: { url: string; tamano: TamanoBloque }) {
         height={1067}
         sizes={SIZES_BLOQUE[tamano]}
         className="w-full h-auto rounded-sm drop-shadow-sutil"
+        draggable={false}
       />
     </div>
   );
 }
 
-function BloqueVideo({ url, ancho }: { url: string; ancho: number }) {
+function BloqueVideo({ url, ancho, titulo }: { url: string; ancho: number; titulo: string }) {
   const embed = parseEmbed(url);
   if (!embed) return null;
   return (
@@ -129,7 +133,7 @@ function BloqueVideo({ url, ancho }: { url: string; ancho: number }) {
       >
         <iframe
           src={embed.src}
-          title="Video de la obra"
+          title={titulo}
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -145,7 +149,7 @@ function BloqueVideo({ url, ancho }: { url: string; ancho: number }) {
  * server component: los iframes de video salen como HTML estático, sin JS de
  * cliente, así que no hay riesgo de errores de hidratación.
  */
-export default function BloquesObra({ bloques }: { bloques: Bloque[] }) {
+export default function BloquesObra({ bloques, idioma }: { bloques: Bloque[]; idioma: Idioma }) {
   if (bloques.length === 0) return null;
 
   return (
@@ -163,7 +167,7 @@ export default function BloquesObra({ bloques }: { bloques: Bloque[] }) {
         }
         if (b.tipo === 'video') {
           return b.videoUrl ? (
-            <BloqueVideo key={b.id} url={b.videoUrl} ancho={b.videoAncho ?? 100} />
+            <BloqueVideo key={b.id} url={b.videoUrl} ancho={b.videoAncho ?? 100} titulo={textos(idioma).videoDeLaObra} />
           ) : null;
         }
         return null;

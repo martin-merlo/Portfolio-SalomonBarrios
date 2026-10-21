@@ -12,9 +12,11 @@ import { paginarHtml } from './paginarHtml';
  * El contenedor al que se ata `contenedorRef` es la caja medida: su ancho/alto
  * es el espacio de cada página, así que no debe llevar padding propio (ponerlo
  * en un wrapper exterior). `clase` es la clase tipográfica de las páginas
- * visibles (la misma se usa en el clon de medición). Recalcula al cambiar el
- * ancho de ventana (debounce 200ms) y cuando terminan de cargar las fuentes
- * (cambian las métricas). Sólo para componentes de cliente.
+ * visibles (la misma se usa en el clon de medición). Recalcula cuando cambia
+ * el TAMAÑO DE LA CAJA (ResizeObserver, debounce 150ms: cubre el resize de la
+ * ventana y también la caja que toma el alto sobrante del hero en mobile, que
+ * cambia cuando cargan las fuentes del título/subtítulo) y cuando terminan de
+ * cargar las fuentes. Sólo para componentes de cliente.
  */
 export function usePaginacion(html: string, clase: string) {
   const contenedorRef = useRef<HTMLDivElement>(null);
@@ -35,11 +37,20 @@ export function usePaginacion(html: string, clase: string) {
     recalcular();
 
     let resizeTimer: ReturnType<typeof setTimeout>;
+    let ultimo = { w: -1, h: -1 };
     function onResize() {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(recalcular, 200);
+      resizeTimer = setTimeout(recalcular, 150);
     }
-    window.addEventListener('resize', onResize);
+    // Sólo si cambió el tamaño de la caja (no por cualquier re-layout).
+    const ro = new ResizeObserver(([entrada]) => {
+      const { width, height } = entrada.contentRect;
+      if (Math.abs(width - ultimo.w) < 0.5 && Math.abs(height - ultimo.h) < 0.5) return;
+      const primera = ultimo.w < 0;
+      ultimo = { w: width, h: height };
+      if (!primera) onResize();
+    });
+    if (contenedorRef.current) ro.observe(contenedorRef.current);
 
     // Las fuentes self-hosted todavía corren con fallback (ver
     // public/fonts/README.md); cuando llegan, las métricas cambian y hay que
@@ -47,7 +58,7 @@ export function usePaginacion(html: string, clase: string) {
     document.fonts?.ready?.then(() => recalcular());
 
     return () => {
-      window.removeEventListener('resize', onResize);
+      ro.disconnect();
       clearTimeout(resizeTimer);
     };
   }, [recalcular]);

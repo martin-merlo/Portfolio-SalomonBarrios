@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed": "node scripts/seed.mjs"
+    "seed": "node scripts/seed.mjs",
+    "reducir-imagenes": "node scripts/reducir-imagenes.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

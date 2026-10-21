@@ -1,3 +1,4 @@
+import { textos, type Idioma } from '@/lib/i18n';
 import Link from 'next/link';
 import type { Obra, TamanoGrilla } from '@/lib/tipos';
 import { fondoImagen } from '@/lib/imagen';
@@ -19,7 +20,7 @@ const SPAN: Record<TamanoGrilla, string> = {
  * pointer). Si no, es puramente informativa: sin cursor de interacción y sin
  * ninguna acción de click.
  */
-export default function ObraCard({ obra }: { obra: Obra }) {
+export default function ObraCard({ obra, idioma }: { obra: Obra; idioma: Idioma }) {
   const conHover = obra.tieneHover && !!obra.imagenHoverUrl;
   const clickeable = obra.tienePaginaPropia;
   const etiqueta = `${obra.titulo}${obra.tecnica ? `, ${obra.tecnica}` : ''}${obra.anio ? `, ${obra.anio}` : ''}`;
@@ -34,7 +35,7 @@ export default function ObraCard({ obra }: { obra: Obra }) {
           con data-aberracion (ver AberracionCromatica): el filtro no puede ir
           en la imagen base, que ya usa `filter` para el brillo del hover, y la
           descripción/título quedan afuera — nada de aberración sobre texto. */}
-      <div data-aberracion="imagen" className="absolute inset-0">
+      <div data-aberracion="imagen" data-protegida className="absolute inset-0">
         <div
           className={`absolute inset-0 bg-cover bg-center ${!conHover ? styles.brillo : ''}`}
           style={{ backgroundImage: fondoImagen(obra.imagenUrl) }}
@@ -75,7 +76,7 @@ export default function ObraCard({ obra }: { obra: Obra }) {
 
   if (clickeable) {
     return (
-      <Link href={`/obra/${obra.slug}`} aria-label={`Ver obra ${etiqueta}`} className={className}>
+      <Link href={`/obra/${obra.slug}`} aria-label={`${textos(idioma).verObra} ${etiqueta}`} className={className}>
         {contenido}
       </Link>
     );

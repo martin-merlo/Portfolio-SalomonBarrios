@@ -2,16 +2,22 @@
 
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { textos, type Idioma } from '@/lib/i18n';
+import SelectorIdioma from './SelectorIdioma';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const ITEMS = [
-  { label: 'BIO', href: '#bio' },
-  { label: 'WORK', href: '#work' },
-  { label: 'CONTACTO', href: '#contacto' },
-  { label: 'CV', href: '#cav' },
-];
+// Ítems del menú en el idioma activo (los ids de las secciones no cambian).
+function itemsMenu(idioma: Idioma) {
+  const n = textos(idioma).nav;
+  return [
+    { label: n.bio, href: '#bio' },
+    { label: n.work, href: '#work' },
+    { label: n.contacto, href: '#contacto' },
+    { label: n.cv, href: '#cav' },
+  ];
+}
 
 const BREAKPOINT_MOBILE = '(max-width: 767px)';
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
@@ -28,7 +34,8 @@ const NAVBG_MAX_OPACITY = 0.8;
  * x/y/scale con scrub (FLIP manual). En mobile reemplaza esa transición de
  * posición por un crossfade simple. Recalcula todo en resize (debounced).
  */
-export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
+export default function Navbar({ heroTitulo, idioma }: { heroTitulo: string; idioma: Idioma }) {
+  const items = itemsMenu(idioma);
   const navSlotRef = useRef<HTMLSpanElement>(null);
   const navBgRef = useRef<HTMLDivElement>(null);
 
@@ -229,15 +236,22 @@ export default function Navbar({ heroTitulo }: { heroTitulo: string }) {
       {/* Mobile: gap-1.5 + tracking normal (y 11px por debajo de 360px) para que
           BIO · WORK · CONTACTO · CV entre en una fila junto al nombre aun a
           320px; desde sm: los mismos valores de siempre. */}
-      <ul className="relative z-10 flex gap-1.5 sm:gap-6 lg:gap-8 font-mono font-bold uppercase text-[11px] min-[360px]:text-xs sm:text-base lg:text-lg tracking-normal sm:tracking-wide text-claro shrink-0">
-        {ITEMS.map((item) => (
-          <li key={item.label}>
-            <a href={item.href} className="hover:opacity-70 transition-opacity">
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <div className="relative z-10 flex items-center gap-10 xl:gap-12 shrink-0">
+        {/* Toggle ES/EN: desde lg en la fila, a la izquierda de BIO con aire. */}
+        <SelectorIdioma idioma={idioma} className="hidden lg:flex" />
+        <ul className="flex gap-1.5 sm:gap-6 lg:gap-8 font-mono font-bold uppercase text-[11px] min-[360px]:text-xs sm:text-base lg:text-lg tracking-normal sm:tracking-wide text-claro">
+          {items.map((item) => (
+            <li key={item.href}>
+              <a href={item.href} className="hover:opacity-70 transition-opacity">
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {/* Mobile y tablet (< lg): en la fila no entra (los 4 ítems ya llenan el
+          ancho a 320px), así que va fijo justo debajo del navbar, a la derecha. */}
+      <SelectorIdioma idioma={idioma} className="lg:hidden absolute top-full right-3 sm:right-8 mt-2" />
     </nav>
   );
 }

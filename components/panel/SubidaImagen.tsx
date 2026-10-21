@@ -78,7 +78,10 @@ export default function SubidaImagen({ valor, onCambiar, carpeta, etiqueta }: Su
 
     try {
       const comprimido = await imageCompression(archivo, {
-        maxWidthOrHeight: 2500,
+        // 1600px máx. (antes 2500): las obras se publican a una resolución que
+        // se ve bien en pantalla pero no sirve para imprimir o revender si
+        // alguien se las lleva. Ver ProtegerObras.
+        maxWidthOrHeight: 1600,
         initialQuality: 0.85,
         fileType: 'image/jpeg',
         useWebWorker: true,

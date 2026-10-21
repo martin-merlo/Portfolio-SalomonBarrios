@@ -1,5 +1,6 @@
 'use client';
 
+import { textos, type Idioma } from '@/lib/i18n';
 import { useRef } from 'react';
 import { MARGEN_PAPEL } from '@/lib/estilos';
 import { usePaginacion } from '@/lib/usePaginacion';
@@ -13,7 +14,8 @@ const CLASE_TEXTO_PAGINA =
   'texto-rico texto-rico--lineas font-cuerpo text-tinta text-sm sm:text-base leading-relaxed pr-2 sm:pr-6';
 
 /** `html`: el CV ya sanitizado (lo sanitiza app/page.tsx, server component). */
-export default function Cav({ html }: { html: string }) {
+export default function Cav({ html, idioma }: { html: string; idioma: Idioma }) {
+  const tx = textos(idioma);
   const { contenedorRef, paginas, pagina, setPagina, ir, total } = usePaginacion(
     html,
     CLASE_TEXTO_PAGINA,
@@ -26,7 +28,7 @@ export default function Cav({ html }: { html: string }) {
   return (
     <section id="cav" className={`${MARGEN_PAPEL} scroll-mt-16 sm:scroll-mt-[72px] pb-24 sm:pb-32`}>
       <div className="max-w-[1500px] mx-auto">
-        <SectionLabel texto="CV.4" />
+        <SectionLabel texto={tx.labels.cv} />
 
         {/*
          * Cuadro de color sólido (token recuadro = claro, #F7F6F2, con sombra sutil) detrás del texto,
@@ -53,7 +55,8 @@ export default function Cav({ html }: { html: string }) {
           onIr={ir}
           onElegir={setPagina}
           tono="tinta"
-          etiqueta="Páginas del CV"
+          etiqueta={tx.paginasCv}
+          idioma={idioma}
           className="justify-center mt-8"
         />
       </div>

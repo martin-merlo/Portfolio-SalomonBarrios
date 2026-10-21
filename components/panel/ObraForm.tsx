@@ -8,6 +8,8 @@ import type { Obra, TamanoGrilla } from '@/lib/tipos';
 import SubidaImagen from './SubidaImagen';
 import Toggle from './Toggle';
 import ObraBloques from './ObraBloques';
+import CampoBilingue from './CampoBilingue';
+import type { Idioma } from '@/lib/i18n';
 
 const OPCIONES_TAMANO: { valor: TamanoGrilla; etiqueta: string; forma: string }[] = [
   { valor: 'normal', etiqueta: 'Normal', forma: 'aspect-square w-10' },
@@ -52,6 +54,11 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
   const [slug, setSlug] = useState(obraInicial?.slug ?? '');
   const [slugTocado, setSlugTocado] = useState(modo === 'editar');
   const [subtituloExtendido, setSubtituloExtendido] = useState(obraInicial?.subtituloExtendido ?? '');
+  // Versión en inglés (toggle ES/EN del sitio). Vacío = se muestra el español.
+  const [tituloEn, setTituloEn] = useState(obraInicial?.tituloEn ?? '');
+  const [tecnicaEn, setTecnicaEn] = useState(obraInicial?.tecnicaEn ?? '');
+  const [descripcionEn, setDescripcionEn] = useState(obraInicial?.descripcionEn ?? '');
+  const [subtituloExtendidoEn, setSubtituloExtendidoEn] = useState(obraInicial?.subtituloExtendidoEn ?? '');
 
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -96,6 +103,11 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
       publicada,
       tiene_pagina_propia: tienePaginaPropia,
       subtitulo_extendido: subtituloExtendido.trim() || null,
+      // Inglés (migración 0004).
+      titulo_en: tituloEn.trim() || null,
+      tecnica_en: tecnicaEn.trim() || null,
+      descripcion_en: descripcionEn.trim() || null,
+      subtitulo_extendido_en: subtituloExtendidoEn.trim() || null,
     };
 
     if (modo === 'crear') {
@@ -168,25 +180,24 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
           Datos básicos
         </h2>
 
-        <Campo label="Título" requerido>
-          <input
-            type="text"
-            required
-            value={titulo}
-            onChange={(e) => onCambiarTitulo(e.target.value)}
-            className="input"
-          />
-        </Campo>
+        <CampoBilingue
+          etiqueta="Título"
+          requerido
+          tipo="linea"
+          es={titulo}
+          en={tituloEn}
+          onCambio={(idioma: Idioma, v) => (idioma === 'es' ? onCambiarTitulo(v) : setTituloEn(v))}
+        />
 
-        <div className="grid grid-cols-3 gap-3">
-          <Campo label="Técnica">
-            <input
-              type="text"
-              value={tecnica}
-              onChange={(e) => setTecnica(e.target.value)}
-              className="input"
-            />
-          </Campo>
+        <CampoBilingue
+          etiqueta="Técnica"
+          tipo="linea"
+          es={tecnica}
+          en={tecnicaEn}
+          onCambio={(idioma: Idioma, v) => (idioma === 'es' ? setTecnica(v) : setTecnicaEn(v))}
+        />
+
+        <div className="grid grid-cols-2 gap-3">
           <Campo label="Año">
             <input
               type="number"
@@ -205,14 +216,14 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
           </Campo>
         </div>
 
-        <Campo label="Descripción" ayuda="Se usa en el overlay de hover de la galería y en el hero de la página individual.">
-          <textarea
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-            rows={3}
-            className="input"
-          />
-        </Campo>
+        <CampoBilingue
+          etiqueta="Descripción"
+          tipo="parrafo"
+          es={descripcion}
+          en={descripcionEn}
+          onCambio={(idioma: Idioma, v) => (idioma === 'es' ? setDescripcion(v) : setDescripcionEn(v))}
+          ayuda="Se usa en el overlay de hover de la galería y en el hero de la página individual."
+        />
 
         <Campo label="Slug" ayuda={
           modo === 'crear'
@@ -303,17 +314,14 @@ export default function ObraForm({ modo, obraInicial }: ObraFormProps) {
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
           Página individual
         </h2>
-        <Campo
-          label="Subtítulo extendido"
+        <CampoBilingue
+          etiqueta="Subtítulo extendido"
+          tipo="linea"
+          es={subtituloExtendido}
+          en={subtituloExtendidoEn}
+          onCambio={(idioma: Idioma, v) => (idioma === 'es' ? setSubtituloExtendido(v) : setSubtituloExtendidoEn(v))}
           ayuda="Encabezado de la sección de contenido de la página individual (/obra/[slug]), arriba de los bloques. El contenido en sí se arma con los bloques de abajo."
-        >
-          <input
-            type="text"
-            value={subtituloExtendido}
-            onChange={(e) => setSubtituloExtendido(e.target.value)}
-            className="input"
-          />
-        </Campo>
+        />
       </section>
 
       {/* Contenido libre de la página individual. Reemplazó a "Texto extendido"

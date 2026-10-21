@@ -265,3 +265,16 @@ html.aberracion-activa [data-aberracion='texto'] {
     transparent 3px
   );
 }
+
+/* Obras protegidas (data-protegida, ver components/ProtegerObras.tsx): sin el
+   "Guardar en Fotos" de mantener presionado en iOS, y las <img> sin arrastre ni
+   selección. El texto que haya dentro (p. ej. la descripción en el hero de la
+   obra) sigue seleccionable. */
+[data-protegida],
+[data-protegida] img {
+  -webkit-touch-callout: none;
+}
+[data-protegida] img {
+  -webkit-user-drag: none;
+  user-select: none;
+}

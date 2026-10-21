@@ -4,13 +4,22 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { CLAVES_CONTENIDO } from '@/lib/mapeo';
-import type { ContenidoSitio } from '@/lib/tipos';
+import { CAMPOS_CONTENIDO_TRADUCIBLES, type CampoContenidoTraducible, type ContenidoSitio, type ContenidoSitioEn } from '@/lib/tipos';
+import type { Idioma } from '@/lib/i18n';
 import SubidaImagen from './SubidaImagen';
-import EditorTextoRico from './EditorTextoRico';
+import CampoBilingue from './CampoBilingue';
 
-export default function ContenidoForm({ contenidoInicial }: { contenidoInicial: ContenidoSitio }) {
+export default function ContenidoForm({
+  contenidoInicial,
+  enInicial,
+}: {
+  contenidoInicial: ContenidoSitio;
+  enInicial: ContenidoSitioEn;
+}) {
   const router = useRouter();
   const [contenido, setContenido] = useState<ContenidoSitio>(contenidoInicial);
+  // Versión en inglés de los campos traducibles (toggle ES/EN del sitio).
+  const [en, setEn] = useState<ContenidoSitioEn>(enInicial);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
@@ -20,15 +29,29 @@ export default function ContenidoForm({ contenidoInicial }: { contenidoInicial: 
     setOk(false);
   }
 
+  /** Para los CampoBilingue: escribe el español o el inglés del campo. */
+  function setBilingue(campo: CampoContenidoTraducible) {
+    return (idioma: Idioma, valor: string) => {
+      if (idioma === 'es') set(campo, valor);
+      else {
+        setEn((prev) => ({ ...prev, [campo]: valor }));
+        setOk(false);
+      }
+    };
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setGuardando(true);
 
     const supabase = createClient();
+    const traducibles = new Set<string>(CAMPOS_CONTENIDO_TRADUCIBLES);
     const filas = (Object.keys(CLAVES_CONTENIDO) as (keyof ContenidoSitio)[]).map((campo) => ({
       clave: CLAVES_CONTENIDO[campo],
       valor: contenido[campo] ?? '',
+      // valor_en sólo en los campos traducibles (migración 0004).
+      ...(traducibles.has(campo) ? { valor_en: en[campo as CampoContenidoTraducible] || null } : {}),
     }));
 
     const { error: upsertError } = await supabase
@@ -69,14 +92,13 @@ export default function ContenidoForm({ contenidoInicial }: { contenidoInicial: 
             className="input"
           />
         </Campo>
-        <Campo label="Subtítulo del hero">
-          <input
-            type="text"
-            value={contenido.heroSubtitulo}
-            onChange={(e) => set('heroSubtitulo', e.target.value)}
-            className="input"
-          />
-        </Campo>
+        <CampoBilingue
+          etiqueta="Subtítulo del hero"
+          tipo="linea"
+          es={contenido.heroSubtitulo}
+          en={en.heroSubtitulo}
+          onCambio={setBilingue('heroSubtitulo')}
+        />
         <Campo label="Imagen de fondo del hero">
           <SubidaImagen
             valor={contenido.heroImagenUrl || null}
@@ -90,57 +112,50 @@ export default function ContenidoForm({ contenidoInicial }: { contenidoInicial: 
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
           Declaración del artista
         </h2>
-        <Campo label="Título">
-          <input
-            type="text"
-            value={contenido.declaracionTitulo}
-            onChange={(e) => set('declaracionTitulo', e.target.value)}
-            className="input"
-          />
-        </Campo>
-        <Campo
-          label="Texto"
-          sinLabel
+        <CampoBilingue
+          etiqueta="Título"
+          tipo="linea"
+          es={contenido.declaracionTitulo}
+          en={en.declaracionTitulo}
+          onCambio={setBilingue('declaracionTitulo')}
+        />
+        <CampoBilingue
+          etiqueta="Texto"
+          tipo="rico"
+          es={contenido.declaracionTexto}
+          en={en.declaracionTexto}
+          onCambio={setBilingue('declaracionTexto')}
+          placeholder="Texto de la declaración…"
+          altoMinimo="min-h-[8rem]"
           ayuda="Se corta solo en páginas en el sitio según el largo."
-        >
-          <EditorTextoRico
-            valorInicial={contenido.declaracionTexto}
-            onCambio={(html) => set('declaracionTexto', html ?? '')}
-            etiqueta="Texto de la declaración del artista"
-            placeholder="Texto de la declaración…"
-            altoMinimo="min-h-[8rem]"
-          />
-        </Campo>
+        />
       </section>
 
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">Bio</h2>
-        <Campo label="Texto de bio" sinLabel>
-          <EditorTextoRico
-            valorInicial={contenido.bioTexto}
-            onCambio={(html) => set('bioTexto', html ?? '')}
-            etiqueta="Texto de bio"
-            placeholder="Texto de bio…"
-            altoMinimo="min-h-[12rem]"
-          />
-        </Campo>
+        <CampoBilingue
+          etiqueta="Texto de bio"
+          tipo="rico"
+          es={contenido.bioTexto}
+          en={en.bioTexto}
+          onCambio={setBilingue('bioTexto')}
+          placeholder="Texto de bio…"
+          altoMinimo="min-h-[12rem]"
+        />
       </section>
 
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">CV</h2>
-        <Campo
-          label="Texto de CV"
-          sinLabel
+        <CampoBilingue
+          etiqueta="Texto de CV"
+          tipo="rico"
+          es={contenido.cvTexto}
+          en={en.cvTexto}
+          onCambio={setBilingue('cvTexto')}
+          placeholder="Texto de CV…"
+          altoMinimo="min-h-[20rem]"
           ayuda="Este texto se corta solo en páginas en el sitio público según el largo — no te preocupes por dónde cortarlo, escribilo corrido."
-        >
-          <EditorTextoRico
-            valorInicial={contenido.cvTexto}
-            onCambio={(html) => set('cvTexto', html ?? '')}
-            etiqueta="Texto de CV"
-            placeholder="Texto de CV…"
-            altoMinimo="min-h-[20rem]"
-          />
-        </Campo>
+        />
       </section>
 
       <section className="space-y-4">

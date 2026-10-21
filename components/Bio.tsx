@@ -1,8 +1,9 @@
+import { textos, type Idioma } from '@/lib/i18n';
 import { MARGEN_PAPEL } from '@/lib/estilos';
 import { sanitizarHtmlRico } from '@/lib/sanitizarHtml';
 import SectionLabel from './SectionLabel';
 
-export default function Bio({ texto }: { texto: string }) {
+export default function Bio({ texto, idioma }: { texto: string; idioma: Idioma }) {
   // HTML del editor del panel (o texto plano viejo, que se convierte a
   // párrafos), SIEMPRE sanitizado. Bio no pagina: el formato es libre.
   const html = sanitizarHtmlRico(texto);
@@ -10,7 +11,7 @@ export default function Bio({ texto }: { texto: string }) {
   return (
     <section id="bio" className={`${MARGEN_PAPEL} pt-20 sm:pt-28 pb-16`}>
       <div className="max-w-[1500px] mx-auto">
-        <SectionLabel texto="bio.1" />
+        <SectionLabel texto={textos(idioma).labels.bio} />
         {/*
          * Cuadro de color sólido (token recuadro = claro, #F7F6F2, con sombra sutil) detrás del bloque de
          * texto, ajustado al bloque con algo de padding: el texto se lee sobre un

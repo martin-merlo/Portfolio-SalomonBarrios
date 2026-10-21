@@ -7,17 +7,19 @@ import PaperSurface from '@/components/PaperSurface';
 import SectionLabel from '@/components/SectionLabel';
 import BloquesObra from '@/components/BloquesObra';
 import { MARGEN_PAPEL } from '@/lib/estilos';
+import { getIdioma } from '@/lib/idioma';
+import { localizarBloque, localizarObra } from '@/lib/i18n';
 
-// El artista va a estar editando obras desde el panel más adelante — no hace
-// falta que el contenido sea instantáneo, así que revalidamos cada 60s.
-export const revalidate = 60;
+// Se renderiza por request: el idioma (toggle ES/EN, misma URL) sale de una
+// cookie o del navegador del visitante — ver lib/idioma.ts.
 
 type Params = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const obra = await getObraBySlug(slug);
-  if (!obra) return {};
+  const [obraEs, idioma] = await Promise.all([getObraBySlug(slug), getIdioma()]);
+  if (!obraEs) return {};
+  const obra = localizarObra(obraEs, idioma);
 
   return {
     title: `${obra.titulo} — Salomón Barrios`,
@@ -27,11 +29,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function ObraPage({ params }: Params) {
   const { slug } = await params;
-  const [obra, contenido] = await Promise.all([getObraBySlug(slug), getContenido()]);
+  const idioma = await getIdioma();
+  const [obraEs, contenido] = await Promise.all([getObraBySlug(slug), getContenido(idioma)]);
 
-  if (!obra) notFound();
+  if (!obraEs) notFound();
 
-  const bloques = await getBloquesDeObra(obra.id);
+  const obra = localizarObra(obraEs, idioma);
+  const bloques = (await getBloquesDeObra(obra.id)).map((b) => localizarBloque(b, idioma));
 
   // Sección de contenido extendido = subtítulo (encabezado) + bloques. Si no hay
   // ni subtítulo ni bloques, la página termina en el hero, sin dejar un vacío.
@@ -39,9 +43,9 @@ export default async function ObraPage({ params }: Params) {
 
   return (
     <>
-      <NavbarObra nombreArtista={contenido.heroTitulo} />
+      <NavbarObra nombreArtista={contenido.heroTitulo} idioma={idioma} />
       <main>
-        <ObraHero titulo={obra.titulo} imagenUrl={obra.imagenUrl} descripcion={obra.descripcion} />
+        <ObraHero titulo={obra.titulo} imagenUrl={obra.imagenUrl} descripcion={obra.descripcion} idioma={idioma} />
 
         {/*
           PaperSurface sólo cuando hay contenido extendido, para que la subpágina
@@ -55,7 +59,7 @@ export default async function ObraPage({ params }: Params) {
             <section className={`${MARGEN_PAPEL} pt-20 sm:pt-28 pb-20 sm:pb-28 min-h-[70vh]`}>
               <div className="max-w-[1500px] mx-auto">
                 {obra.subtituloExtendido && <SectionLabel texto={obra.subtituloExtendido} />}
-                <BloquesObra bloques={bloques} />
+                <BloquesObra bloques={bloques} idioma={idioma} />
               </div>
             </section>
           </PaperSurface>

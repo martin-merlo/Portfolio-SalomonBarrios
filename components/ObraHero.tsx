@@ -1,3 +1,4 @@
+import { textos, type Idioma } from '@/lib/i18n';
 import { fondoImagen } from '@/lib/imagen';
 
 /**
@@ -12,14 +13,17 @@ export default function ObraHero({
   titulo,
   imagenUrl,
   descripcion,
+  idioma,
 }: {
   titulo: string;
   imagenUrl: string;
   descripcion: string;
+  idioma: Idioma;
 }) {
   return (
     <section
       id="obra-hero"
+      data-protegida
       className="sticky top-0 z-0 w-full overflow-hidden bg-tinta"
       style={{
         height: 'calc(100vh - 100px)',
@@ -41,7 +45,7 @@ export default function ObraHero({
 
         <div className="max-w-sm md:mt-2 md:text-right">
           <h2 className="font-mono uppercase tracking-wide text-claro text-sm sm:text-base mb-3">
-            Sobre la obra
+            {textos(idioma).sobreLaObra}
           </h2>
           <p className="font-mono text-claro/85 text-xs sm:text-sm leading-relaxed text-left md:text-right">
             {descripcion}

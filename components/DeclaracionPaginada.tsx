@@ -1,18 +1,18 @@
 'use client';
 
+import { textos, type Idioma } from '@/lib/i18n';
 import { usePaginacion } from '@/lib/usePaginacion';
 import { ControlesPaginas, PistaPaginas } from './Paginacion';
 
-// Caja de cada página. Desktop/tablet: 55vh, pero nunca más que 100vh − 340px
-// — el hero mide 100vh − 100px y el bloque suma ~90px de título + controles;
-// ese tope deja el bloque centrado sin meterse bajo el navbar (72px) en
-// pantallas bajas (p. ej. 1280x650).
-// Mobile: hasta 30vh (antes 24vh fijo) — el bloque va apilado debajo del título
-// y la ola del papel asoma por abajo. En teléfonos bajos se recorta con
-// 100vh − 474px para que los controles no queden pegados a la ola (medido: a
-// 360x640 quedaban a 7px con 30vh), sin bajar nunca de los 24vh de antes.
-const ALTO_CAJA =
-  'h-[max(24vh,min(30vh,calc(100vh_-_474px)))] md:h-[min(55vh,calc(100vh_-_340px))]';
+// Caja de cada página.
+// Desde md: 55vh, pero nunca más que 100vh − 340px — el hero mide 100vh −
+// 100px y el bloque suma ~90px de título + controles; ese tope deja el bloque
+// centrado sin meterse bajo el navbar (72px) en pantallas bajas.
+// Mobile (< md): el bloque ocupa el alto que deja libre la columna del hero
+// (flex-1, ver Hero.tsx), así se adapta al largo del subtítulo y al alto del
+// teléfono sin pisar el toggle de idioma ni la ola del papel. La paginación
+// mide la caja real, así que recorta en tantas páginas como haga falta.
+const ALTO_CAJA = 'flex-1 min-h-[72px] md:flex-none md:h-[min(55vh,calc(100vh_-_340px))]';
 
 // Tipografía del cuerpo de la declaración: 2px más chica que la original
 // (12/14/16px, antes 14/16/18px) para que entre más texto por página. + formato
@@ -47,11 +47,11 @@ const CLASE_TEXTO =
  * salía del hero por la derecha en tablet (768–1023px), recortado.
  */
 /** `html`: la declaración ya sanitizada (la sanitiza Hero, server component). */
-export default function DeclaracionPaginada({ titulo, html }: { titulo: string; html: string }) {
+export default function DeclaracionPaginada({ titulo, html, idioma }: { titulo: string; html: string; idioma: Idioma }) {
   const { contenedorRef, paginas, pagina, setPagina, ir, total } = usePaginacion(html, CLASE_TEXTO);
 
   return (
-    <div id="hero-declaracion" className="w-full min-w-0 max-w-sm md:max-w-md lg:max-w-[min(40vw,640px)] md:mt-2 lg:mr-6 xl:mr-10 [&_a[href]]:pointer-events-auto">
+    <div id="hero-declaracion" className="flex flex-1 min-h-0 flex-col md:block md:flex-none w-full min-w-0 max-w-sm md:max-w-md lg:max-w-[min(40vw,640px)] md:mt-2 lg:mr-6 xl:mr-10 [&_a[href]]:pointer-events-auto">
       <h2 className="font-mono uppercase tracking-wide text-claro text-base sm:text-lg lg:text-xl mb-3">
         {titulo}
       </h2>
@@ -71,7 +71,8 @@ export default function DeclaracionPaginada({ titulo, html }: { titulo: string; 
           onIr={ir}
           onElegir={setPagina}
           tono="claro"
-          etiqueta="Páginas de la declaración del artista"
+          etiqueta={textos(idioma).paginasDeclaracion}
+          idioma={idioma}
           className="mt-4 pointer-events-auto"
         />
       )}
