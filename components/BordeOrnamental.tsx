@@ -18,9 +18,10 @@ const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 const ANCHO_BORDE = 'w-[56px] sm:w-[110px] lg:w-[160px]';
 const ALTO_TIRA = 'h-[56px] sm:h-[110px] lg:h-[160px]';
 
-// Historia: 0.45 → 0.38 → 0.28 (más sutil; elegido a ojo sobre el papel entre
-// 0.25 y 0.30: con 0.25 en las zonas claras del dibujo casi se perdía).
-const OPACIDAD_BORDE = 0.28;
+// Único punto donde se define la opacidad (la usan las dos tiras vía
+// ESTILO_CONTENEDOR). Se elige a ojo sobre el papel: al bajarla, las zonas
+// claras del dibujo son las primeras en perderse.
+const OPACIDAD_BORDE = 0.18;
 
 // Fade en el arranque (arriba): el borde aparece gradualmente en vez de nacer
 // con un corte seco. La máscara va en el contenedor exterior (fijo a la
@@ -133,10 +134,10 @@ export default function BordeOrnamental() {
     // del swap de la fuente real). Sin refrescar, ese 'end' queda corto:
     // pasado ese punto el trigger deja de estar activo y el borde se
     // congela en vez de seguir la proporción 0.5 hasta el final real de la
-    // página. Mismo patrón de recálculo que el título anclado (Navbar) y
-    // la paginación del CV (Cav): resize con debounce + fonts.ready. Sumamos
-    // un ResizeObserver sobre <body> porque el reflow que dispara esto no
-    // llega a través de un evento 'resize' de window.
+    // página. Mismo patrón de recálculo que la paginación del CV (Cav):
+    // debounce + fonts.ready (el título anclado del Navbar, en cambio, sólo
+    // recalcula en resize). Sumamos un ResizeObserver sobre <body> porque el
+    // reflow que dispara esto no llega a través de un evento 'resize' de window.
     let refreshTimer: ReturnType<typeof setTimeout>;
     function refrescar() {
       clearTimeout(refreshTimer);

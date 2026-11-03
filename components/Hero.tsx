@@ -64,7 +64,7 @@ export default function Hero({ contenido, idioma }: { contenido: ContenidoSitio;
             que sobra (ver DeclaracionPaginada). Así nada se pisa aunque el
             subtítulo ocupe varias líneas o la pantalla sea baja. Desde md: fila
             centrada, como siempre. */}
-        <div className="h-full px-5 sm:px-10 lg:px-14 pt-[108px] sm:pt-[124px] pb-[calc(19.6vw+14px)] md:pt-0 md:pb-0 flex flex-col justify-start gap-6 [@media(max-height:700px)]:gap-4 sm:gap-8 md:flex-row md:items-center md:justify-between md:gap-12">
+        <div className="h-full px-5 sm:px-10 lg:px-14 pt-[108px] sm:pt-[124px] pb-[calc(19.6vw+14px)] md:pt-0 md:pb-0 flex flex-col justify-start gap-6 max-md:[@media(max-height:700px)]:gap-4 sm:gap-8 md:flex-row md:items-center md:justify-between md:gap-12">
           {/*
             Posición del título: prioriza la COMPOSICIÓN en reposo (como en
             referencia/diseño.pdf, donde el título arranca a ~12% del ancho) por
@@ -101,7 +101,7 @@ export default function Hero({ contenido, idioma }: { contenido: ContenidoSitio;
             <h1
               id="hero-title"
               data-aberracion="texto"
-              className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] [@media(max-height:700px)]:text-[10.5vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]"
+              className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] max-md:[@media(max-height:700px)]:text-[10.5vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]"
               style={{ transformOrigin: 'left center', position: 'relative' }}
             >
               {contenido.heroTitulo}

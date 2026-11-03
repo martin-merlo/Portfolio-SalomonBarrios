@@ -39,19 +39,20 @@ const CLASE_TEXTO =
  *  - Por lo mismo, los links del texto llevan pointer-events-auto
  *    ([&_a[href]]); el resto del texto sigue sin capturar clicks.
  *
- * Ancho: hasta 40vw (tope 640px) en desktop para que entre bastante texto
- * por página. Si no hay lugar, el flex del hero lo angosta antes que pisar al
- * título (gap-12 entre ambos), y la paginación se recalcula con lo que quede.
- * min-w-0 es lo que habilita ese angostamiento: sin él, el min-width:auto del
- * flex toma el mínimo de la pista de páginas (todas en fila) y el bloque se
- * salía del hero por la derecha en tablet (768–1023px), recortado.
+ * Ancho: hasta 448px en md y 40vw (tope 640px) desde lg, para que entre bastante
+ * texto por página. Si no hay lugar, el flex del hero angosta este bloque y el
+ * del título (que no baja de su palabra más larga), manteniendo el gap-12 entre
+ * ambos, y la paginación se recalcula con lo que quede. Hacen falta las dos
+ * clases: md:flex-initial permite encogerse (con md:flex-none el bloque se salía
+ * del hero por la derecha en tablet, recortado) y min-w-0 quita el piso del
+ * min-width:auto, que sería el mínimo de la pista de páginas (todas en fila).
  */
 /** `html`: la declaración ya sanitizada (la sanitiza Hero, server component). */
 export default function DeclaracionPaginada({ titulo, html, idioma }: { titulo: string; html: string; idioma: Idioma }) {
   const { contenedorRef, paginas, pagina, setPagina, ir, total } = usePaginacion(html, CLASE_TEXTO);
 
   return (
-    <div id="hero-declaracion" className="flex flex-1 min-h-0 flex-col md:block md:flex-none w-full min-w-0 max-w-sm md:max-w-md lg:max-w-[min(40vw,640px)] md:mt-2 lg:mr-6 xl:mr-10 [&_a[href]]:pointer-events-auto">
+    <div id="hero-declaracion" className="flex flex-1 min-h-0 flex-col md:block md:flex-initial w-full min-w-0 max-w-sm md:max-w-md lg:max-w-[min(40vw,640px)] md:mt-2 lg:mr-6 xl:mr-10 [&_a[href]]:pointer-events-auto">
       <h2 className="font-mono uppercase tracking-wide text-claro text-base sm:text-lg lg:text-xl mb-3">
         {titulo}
       </h2>
