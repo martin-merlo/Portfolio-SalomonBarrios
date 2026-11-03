@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type DragEvent } from 'react';
+import { useRef, useState, type DragEvent, type RefObject } from 'react';
 import imageCompression from 'browser-image-compression';
 import { createClient } from '@/lib/supabase/client';
 
@@ -41,11 +41,48 @@ function urlPublica(ruta: string): string {
   return `${SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${ruta}`;
 }
 
+/** Medidas en px de la imagen ya comprimida (undefined si no se pudieron leer). */
+async function medirImagen(blob: Blob): Promise<MedidasImagen | undefined> {
+  try {
+    const bitmap = await createImageBitmap(blob);
+    const medidas = { ancho: bitmap.width, alto: bitmap.height };
+    bitmap.close();
+    return medidas;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Borra del bucket el archivo de una URL pública. Devuelve false si no se
+ * borró. Sin permiso, Storage responde 200 con la lista vacía en vez de un
+ * error, por eso se revisa también que haya vuelto el archivo. Una URL de otro
+ * origen no tiene archivo nuestro que borrar.
+ */
+export async function borrarImagen(url: string): Promise<boolean> {
+  const prefijo = urlPublica('');
+  if (!url.startsWith(prefijo)) return true;
+  const { data, error } = await createClient()
+    .storage.from(BUCKET)
+    .remove([url.slice(prefijo.length)]);
+  return !error && (data?.length ?? 0) > 0;
+}
+
+export interface MedidasImagen {
+  ancho: number;
+  alto: number;
+}
+
 interface SubidaImagenProps {
   valor: string | null;
-  onCambiar: (url: string) => void;
+  onCambiar: (url: string, medidas?: MedidasImagen) => void;
   carpeta: CarpetaSubida;
   etiqueta?: string;
+  /** Para abrir el selector de archivos desde afuera. */
+  inputRef?: RefObject<HTMLInputElement | null>;
+  /** Oculta la zona de arrastre; la barra de progreso y los errores se siguen viendo. */
+  ocultarZona?: boolean;
+  onSubiendo?: (subiendo: boolean) => void;
 }
 
 /**
@@ -53,10 +90,19 @@ interface SubidaImagenProps {
  * navegador → compresión client-side (máx. 2500px, calidad 0.85) → subida
  * directa al bucket "media" con barra de progreso → devuelve la URL pública
  * final vía onCambiar. Reutilizado en obra principal, hover, galería de
- * obra, proceso e imagen del hero.
+ * obra, proceso, imagen del hero y foto de la bio.
  */
-export default function SubidaImagen({ valor, onCambiar, carpeta, etiqueta }: SubidaImagenProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+export default function SubidaImagen({
+  valor,
+  onCambiar,
+  carpeta,
+  etiqueta,
+  inputRef: inputRefExterno,
+  ocultarZona = false,
+  onSubiendo,
+}: SubidaImagenProps) {
+  const inputRefInterno = useRef<HTMLInputElement>(null);
+  const inputRef = inputRefExterno ?? inputRefInterno;
   const [preview, setPreview] = useState<string | null>(null);
   const [arrastrando, setArrastrando] = useState(false);
   const [progreso, setProgreso] = useState<number | null>(null);
@@ -75,6 +121,7 @@ export default function SubidaImagen({ valor, onCambiar, carpeta, etiqueta }: Su
     const previewLocal = URL.createObjectURL(archivo);
     setPreview(previewLocal);
     setProgreso(0);
+    onSubiendo?.(true);
 
     try {
       const comprimido = await imageCompression(archivo, {
@@ -100,11 +147,12 @@ export default function SubidaImagen({ valor, onCambiar, carpeta, etiqueta }: Su
       const ruta = `${carpeta}/${crypto.randomUUID()}.jpg`;
       await subirConProgreso(ruta, comprimido, session.access_token, setProgreso);
 
-      onCambiar(urlPublica(ruta));
+      onCambiar(urlPublica(ruta), await medirImagen(comprimido));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error inesperado subiendo la imagen.');
     } finally {
       setProgreso(null);
+      onSubiendo?.(false);
     }
   }
 
@@ -134,7 +182,7 @@ export default function SubidaImagen({ valor, onCambiar, carpeta, etiqueta }: Su
         onDrop={onDrop}
         className={`relative flex items-center gap-4 rounded border-2 border-dashed p-3 cursor-pointer transition-colors ${
           arrastrando ? 'border-slate-500 bg-slate-100' : 'border-slate-300 hover:border-slate-400'
-        }`}
+        } ${ocultarZona ? 'hidden' : ''}`}
       >
         {imagenMostrada ? (
           // eslint-disable-next-line @next/next/no-img-element

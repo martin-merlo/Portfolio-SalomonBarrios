@@ -1,13 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { CLAVES_CONTENIDO } from '@/lib/mapeo';
 import { CAMPOS_CONTENIDO_TRADUCIBLES, type CampoContenidoTraducible, type ContenidoSitio, type ContenidoSitioEn } from '@/lib/tipos';
 import type { Idioma } from '@/lib/i18n';
-import SubidaImagen from './SubidaImagen';
+import SubidaImagen, { borrarImagen, type MedidasImagen } from './SubidaImagen';
 import CampoBilingue from './CampoBilingue';
+import CampoFotoBio from './CampoFotoBio';
 
 export default function ContenidoForm({
   contenidoInicial,
@@ -23,6 +24,12 @@ export default function ContenidoForm({
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
+  const [aviso, setAviso] = useState<string | null>(null);
+  // Archivos de la foto de la bio: el que está guardado en la base y los subidos
+  // desde el último guardado. Los que dejen de usarse se borran recién después
+  // de guardar bien el valor nuevo (ver onSubmit).
+  const fotoGuardada = useRef(contenidoInicial.bioImagenUrl);
+  const fotosSubidas = useRef<string[]>([]);
 
   function set<K extends keyof ContenidoSitio>(campo: K, valor: ContenidoSitio[K]) {
     setContenido((prev) => ({ ...prev, [campo]: valor }));
@@ -40,10 +47,27 @@ export default function ContenidoForm({
     };
   }
 
+  function cambiarFotoBio(url: string, medidas?: MedidasImagen) {
+    if (url) fotosSubidas.current.push(url);
+    setContenido((prev) => ({
+      ...prev,
+      bioImagenUrl: url,
+      bioImagenAncho: medidas ? String(medidas.ancho) : '',
+      bioImagenAlto: medidas ? String(medidas.alto) : '',
+    }));
+    setOk(false);
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setAviso(null);
     setGuardando(true);
+
+    // Se toma antes de guardar: una foto que termine de subirse mientras tanto
+    // no entra en este guardado, y tampoco en lo que se borra después.
+    const fotoActual = contenido.bioImagenUrl;
+    const candidatasABorrar = [fotoGuardada.current, ...fotosSubidas.current];
 
     const supabase = createClient();
     const traducibles = new Set<string>(CAMPOS_CONTENIDO_TRADUCIBLES);
@@ -58,13 +82,21 @@ export default function ContenidoForm({
       .from('contenido_sitio')
       .upsert(filas, { onConflict: 'clave' });
 
-    setGuardando(false);
-
     if (upsertError) {
+      setGuardando(false);
       setError('No se pudo guardar. Probá de nuevo.');
       return;
     }
 
+    fotoGuardada.current = fotoActual;
+    fotosSubidas.current = fotosSubidas.current.filter((url) => !candidatasABorrar.includes(url));
+    const sobrantes = [...new Set(candidatasABorrar)].filter((url) => url && url !== fotoActual);
+    const borradas = await Promise.all(sobrantes.map(borrarImagen));
+    if (borradas.includes(false)) {
+      setAviso('Se guardó, pero no se pudo borrar el archivo anterior de la foto: quedó en Storage sin usarse.');
+    }
+
+    setGuardando(false);
     setOk(true);
     router.refresh();
   }
@@ -79,6 +111,11 @@ export default function ContenidoForm({
       {ok && (
         <p className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded px-3 py-2">
           Guardado.
+        </p>
+      )}
+      {aviso && (
+        <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded px-3 py-2">
+          {aviso}
         </p>
       )}
 
@@ -141,6 +178,19 @@ export default function ContenidoForm({
           onCambio={setBilingue('bioTexto')}
           placeholder="Texto de bio…"
           altoMinimo="min-h-[12rem]"
+        />
+        <CampoFotoBio
+          url={contenido.bioImagenUrl}
+          onSubir={cambiarFotoBio}
+          onQuitar={() => cambiarFotoBio('')}
+        />
+        <CampoBilingue
+          etiqueta="Texto alternativo de la foto"
+          tipo="linea"
+          es={contenido.bioImagenAlt}
+          en={en.bioImagenAlt}
+          onCambio={setBilingue('bioImagenAlt')}
+          ayuda="Describe la foto para quienes usan lector de pantalla. No se ve en el sitio."
         />
       </section>
 

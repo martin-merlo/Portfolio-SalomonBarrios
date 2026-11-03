@@ -71,6 +71,12 @@ export interface ContenidoSitio {
   declaracionTitulo: string;
   declaracionTexto: string;
   bioTexto: string;
+  // Foto de la bio. Ancho y alto: px de la imagen ya comprimida (como texto,
+  // porque contenido_sitio es clave/valor); reservan el espacio en el sitio.
+  bioImagenUrl: string;
+  bioImagenAncho: string;
+  bioImagenAlto: string;
+  bioImagenAlt: string;
   cvTexto: string;
   contactoTelefono: string;
   contactoEmail: string;
@@ -87,6 +93,7 @@ export const CAMPOS_CONTENIDO_TRADUCIBLES = [
   'declaracionTitulo',
   'declaracionTexto',
   'bioTexto',
+  'bioImagenAlt',
   'cvTexto',
 ] as const;
 export type CampoContenidoTraducible = (typeof CAMPOS_CONTENIDO_TRADUCIBLES)[number];

@@ -35,7 +35,7 @@ export default async function Home() {
               carrusel de proceso va pegado al CV, justo antes: sigue entre
               Contacto y CV como cuando el orden era CV → proceso → contacto,
               y el CV queda como cierre de la página. */}
-          <Bio texto={contenido.bioTexto} idioma={idioma} />
+          <Bio texto={contenido.bioTexto} foto={contenido} idioma={idioma} />
           <Work obras={obras} idioma={idioma} />
           <Contacto contenido={contenido} idioma={idioma} />
           <Proceso items={proceso} idioma={idioma} />
