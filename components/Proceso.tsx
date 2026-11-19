@@ -2,10 +2,10 @@
 
 import { textos, type Idioma } from '@/lib/i18n';
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { ImagenProceso } from '@/lib/tipos';
-import { fondoImagen } from '@/lib/imagen';
 import { MARGEN_PAPEL } from '@/lib/estilos';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -16,10 +16,15 @@ function Card({ item }: { item: ImagenProceso }) {
       {/* Sin data-aberracion a propósito: el carrusel se mueve todo el tiempo
           (la zona limpia del cursor se "corría" con las imágenes) y duplica
           sus cards para el loop, así que eran 12 de las 16 copias filtradas —
-          lo que más pesaba de la aberración. Medido en EfectosVisuales. */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: fondoImagen(item.imagenUrl) }}
+          lo que más pesaba de la aberración. Medido en EfectosVisuales.
+          next/image al tamaño de la card (220/280px): antes se bajaba el
+          original completo, el 45% del peso de la página. */}
+      <Image
+        src={item.imagenUrl}
+        alt=""
+        fill
+        sizes="(min-width: 640px) 280px, 220px"
+        className="object-cover object-center"
       />
       <p className="absolute bottom-0 inset-x-0 font-mono text-claro text-[0.7rem] sm:text-xs px-3 py-2 bg-tinta/45">
         {item.textoCorto}

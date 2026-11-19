@@ -1,7 +1,7 @@
 import { textos, type Idioma } from '@/lib/i18n';
+import Image from 'next/image';
 import Link from 'next/link';
 import type { Obra, TamanoGrilla } from '@/lib/tipos';
-import { fondoImagen } from '@/lib/imagen';
 import styles from './ObraCard.module.css';
 
 const SPAN: Record<TamanoGrilla, string> = {
@@ -13,6 +13,14 @@ const SPAN: Record<TamanoGrilla, string> = {
   // ilegible → usamos 5/2 (más alta) para que el título siga entrando.
   // normal y banner sin tocar.
   chica: 'col-span-6 lg:col-span-3 aspect-[5/2] lg:aspect-[4/1]',
+};
+
+// Ancho que ocupa la card según SPAN (la grilla tiene tope de 1500px), para que
+// next/image entregue la imagen a ese tamaño y no el archivo original.
+const SIZES: Record<TamanoGrilla, string> = {
+  normal: '(min-width: 1500px) 500px, (min-width: 768px) 33vw, 100vw',
+  banner: '(min-width: 1500px) 1500px, 100vw',
+  chica: '(min-width: 1500px) 375px, (min-width: 1024px) 25vw, 50vw',
 };
 
 /**
@@ -34,17 +42,28 @@ export default function ObraCard({ obra, idioma }: { obra: Obra; idioma: Idioma 
       {/* Las imágenes (base y la que entra al hover) van en un wrapper propio
           con data-aberracion (ver AberracionCromatica): el filtro no puede ir
           en la imagen base, que ya usa `filter` para el brillo del hover, y la
-          descripción/título quedan afuera — nada de aberración sobre texto. */}
+          descripción/título quedan afuera — nada de aberración sobre texto.
+          next/image (fill + object-cover, el mismo encuadre que el fondo CSS de
+          antes) entrega cada imagen al ancho de la card y difiere las que están
+          fuera de pantalla; antes se bajaban los originales completos (hasta
+          2500px) apenas se abría la página. alt vacío: el nombre accesible lo
+          da la card. */}
       <div data-aberracion="imagen" data-protegida className="absolute inset-0">
-        <div
-          className={`absolute inset-0 bg-cover bg-center ${!conHover ? styles.brillo : ''}`}
-          style={{ backgroundImage: fondoImagen(obra.imagenUrl) }}
+        <Image
+          src={obra.imagenUrl}
+          alt=""
+          fill
+          sizes={SIZES[obra.tamanoGrilla]}
+          className={`object-cover object-center ${!conHover ? styles.brillo : ''}`}
         />
         {conHover && (
-          <div
+          <Image
+            src={obra.imagenHoverUrl!}
+            alt=""
             aria-hidden="true"
-            className={`${styles.hoverSlide} absolute inset-0 bg-cover bg-center`}
-            style={{ backgroundImage: fondoImagen(obra.imagenHoverUrl!) }}
+            fill
+            sizes={SIZES[obra.tamanoGrilla]}
+            className={`${styles.hoverSlide} object-cover object-center`}
           />
         )}
       </div>

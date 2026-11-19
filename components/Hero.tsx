@@ -1,6 +1,6 @@
+import Image from 'next/image';
 import type { Idioma } from '@/lib/i18n';
 import type { ContenidoSitio } from '@/lib/tipos';
-import { fondoImagen } from '@/lib/imagen';
 import { sanitizarHtmlRico } from '@/lib/sanitizarHtml';
 import DeclaracionPaginada from './DeclaracionPaginada';
 
@@ -11,13 +11,20 @@ export default function Hero({ contenido, idioma }: { contenido: ContenidoSitio;
         id="hero"
         data-protegida
         className="sticky top-0 z-0 w-full overflow-hidden bg-tinta"
-        style={{
-          height: 'calc(100vh - 100px)',
-          backgroundImage: fondoImagen(contenido.heroImagenUrl),
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
+        style={{ height: 'calc(100vh - 100px)' }}
       >
+        {/* Obra de fondo con next/image: priority porque es lo primero que se ve
+            (se precarga y no se difiere), y se entrega al ancho de la pantalla. */}
+        {contenido.heroImagenUrl && (
+          <Image
+            src={contenido.heroImagenUrl}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center"
+          />
+        )}
         {/* Velo oscuro azulado. El fondo del hero (imagen + velo) queda en z-0
             para que el papel lo tape al scrollear, como siempre. El CONTENIDO
             (título/subtítulo/declaración) NO vive acá: está en la capa de abajo,
