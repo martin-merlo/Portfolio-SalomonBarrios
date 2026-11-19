@@ -29,8 +29,8 @@ const NAVBG_MAX_OPACITY = 0.8;
 /**
  * Navbar de las páginas /obra/[slug]. A diferencia del Navbar del home, acá
  * el nombre del artista es chico y fijo siempre — sin la animación de
- * anclado, que es exclusiva del home (acá el protagonista del hero es el
- * título de la obra). Funciona como link a "/". Los otros cuatro items no
+ * anclado, que es exclusiva del home (acá el protagonista es el título de la
+ * obra, sobre el papel). Funciona como link a "/". Los otros cuatro items no
  * apuntan a secciones de esta página (no existen acá) sino de vuelta al home.
  *
  * Mismo criterio de transparencia que el Navbar del home: arranca sin fondo
@@ -115,9 +115,11 @@ export default function NavbarObra({ nombreArtista, idioma }: { nombreArtista: s
       {/* Mobile: gap-1.5 + tracking normal (y 11px por debajo de 360px) para que
           BIO · WORK · CONTACTO · CV entre en una fila junto al nombre aun a
           320px; desde sm: los mismos valores de siempre. */}
-      <div className="relative z-10 flex items-center gap-10 xl:gap-12 shrink-0">
-        {/* Toggle ES/EN: desde lg en la fila, a la izquierda de BIO con aire. */}
-        <SelectorIdioma idioma={idioma} className="hidden lg:flex" />
+      <div className="relative z-10 flex items-center gap-10 xl:gap-12 bajo:gap-4 shrink-0">
+        {/* Toggle ES/EN: desde lg en la fila, a la izquierda de BIO con aire.
+            También en pantallas apaisadas bajas, igual que en el home (ver
+            Navbar.tsx). */}
+        <SelectorIdioma idioma={idioma} className="hidden lg:flex bajo:flex" />
         <ul className="flex gap-1.5 sm:gap-6 lg:gap-8 font-mono font-bold uppercase text-[11px] min-[360px]:text-xs sm:text-base lg:text-lg tracking-normal sm:tracking-wide text-claro">
           {items.map((item) => (
             <li key={item.href}>
@@ -130,7 +132,7 @@ export default function NavbarObra({ nombreArtista, idioma }: { nombreArtista: s
       </div>
       {/* Mobile y tablet (< lg): en la fila no entra (los 4 ítems ya llenan el
           ancho a 320px), así que va fijo justo debajo del navbar, a la derecha. */}
-      <SelectorIdioma idioma={idioma} className="lg:hidden absolute top-full right-3 sm:right-8 mt-2" />
+      <SelectorIdioma idioma={idioma} className="lg:hidden bajo:hidden absolute top-full right-3 sm:right-8 mt-2" />
     </nav>
   );
 }

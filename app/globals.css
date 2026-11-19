@@ -284,3 +284,21 @@ html.aberracion-activa [data-aberracion='texto'] {
   -webkit-user-drag: none;
   user-select: none;
 }
+
+/* Pantalla de carga (components/PantallaCarga.tsx). */
+/* Ya vista en esta sesión: el script del <head> marca el <html> y no se pinta. */
+html[data-cargado] #pantalla-carga {
+  display: none;
+}
+/* (El scroll durante la carga lo bloquea el script del <head>, no el CSS: con
+   overflow:hidden desaparecía la barra de scroll y el sitio se corría 15px.) */
+/* Red de seguridad: si el JavaScript fallara, se oculta sola a los 12s. */
+#pantalla-carga {
+  animation: pantalla-carga-fuera 0.5s ease 12s forwards;
+}
+@keyframes pantalla-carga-fuera {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

@@ -37,33 +37,48 @@ export default async function ObraPage({ params }: Params) {
   const obra = localizarObra(obraEs, idioma);
   const bloques = (await getBloquesDeObra(obra.id)).map((b) => localizarBloque(b, idioma));
 
-  // Sección de contenido extendido = subtítulo (encabezado) + bloques. Si no hay
-  // ni subtítulo ni bloques, la página termina en el hero, sin dejar un vacío.
+  // Contenido extendido = subtítulo (encabezado) + bloques; puede no haber nada.
   const tieneContenidoExtra = Boolean(obra.subtituloExtendido) || bloques.length > 0;
 
   return (
     <>
       <NavbarObra nombreArtista={contenido.heroTitulo} idioma={idioma} />
       <main>
-        <ObraHero titulo={obra.titulo} imagenUrl={obra.imagenUrl} descripcion={obra.descripcion} idioma={idioma} />
+        <ObraHero imagenUrl={obra.imagenUrl} />
 
         {/*
-          PaperSurface sólo cuando hay contenido extendido, para que la subpágina
-          tenga el marco del sitio (textura + borde ornamental) donde hay algo que
-          mostrar. min-h asegura que el papel sea lo bastante alto como para subir
-          sobre el hero al scrollear. El contenido libre son los bloques; arriba
-          va el subtítulo como encabezado.
+          La página arranca con el papel ya arriba (la obra asoma en la franja de
+          ObraHero) y el título de la obra encabezándolo; debajo, el subtítulo y
+          los bloques si los hay. Siempre con papel, también sin contenido
+          extendido, para que todas las páginas de obra se vean igual.
+          min-h: el papel llena justo la pantalla = 100vh − la franja de
+          ObraHero − lo que la ola de OlaPapel baja de la franja (4.6vw). Una
+          obra sin bloques entra entera en una pantalla, sin un scroll corto que
+          no llega a tapar la franja; con bloques, el contenido manda.
         */}
-        {tieneContenidoExtra && (
-          <PaperSurface>
-            <section className={`${MARGEN_PAPEL} pt-20 sm:pt-28 pb-20 sm:pb-28 min-h-[70vh]`}>
-              <div className="max-w-[1500px] mx-auto">
-                {obra.subtituloExtendido && <SectionLabel texto={obra.subtituloExtendido} />}
-                <BloquesObra bloques={bloques} idioma={idioma} />
-              </div>
-            </section>
-          </PaperSurface>
-        )}
+        <PaperSurface>
+          <section className={`${MARGEN_PAPEL} pt-4 sm:pt-2 pb-20 sm:pb-28 min-h-[calc(100vh_-_max(31vh,160px)_-_4.6vw)]`}>
+            <div className="max-w-[1500px] mx-auto">
+              {/* Sekuya como el título del home, en tinta sobre el papel. Tamaño
+                  más contenido que el del hero del home: acá los títulos son
+                  más largos ("… - Fotolibro") y break-words los parte si no
+                  entran. Con la aberración de títulos (data-aberracion), igual
+                  que antes en el hero de la obra. */}
+              <h1
+                data-aberracion="texto"
+                className="font-display uppercase text-tinta text-center leading-[0.95] break-words text-[9vw] sm:text-[7vw] md:text-[4.4vw] lg:text-[3.6vw]"
+              >
+                {obra.titulo}
+              </h1>
+              {tieneContenidoExtra && (
+                <div className="mt-12 sm:mt-16">
+                  {obra.subtituloExtendido && <SectionLabel texto={obra.subtituloExtendido} />}
+                  <BloquesObra bloques={bloques} idioma={idioma} />
+                </div>
+              )}
+            </div>
+          </section>
+        </PaperSurface>
       </main>
     </>
   );

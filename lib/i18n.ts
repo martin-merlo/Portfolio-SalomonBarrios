@@ -35,7 +35,6 @@ export const DICCIONARIO = {
     nav: { bio: 'BIO', work: 'WORK', contacto: 'CONTACTO', cv: 'CV' },
     labels: { bio: 'bio.1', work: 'work.2', contacto: 'Contacto.3', cv: 'CV.4' },
     idioma: 'Idioma',
-    sobreLaObra: 'Sobre la obra',
     verObra: 'Ver obra',
     videoDeLaObra: 'Video de la obra',
     procesoDeTrabajo: 'Proceso de trabajo',
@@ -45,6 +44,7 @@ export const DICCIONARIO = {
     pagina: 'Página',
     paginasCv: 'Páginas del CV',
     paginasDeclaracion: 'Páginas de la declaración del artista',
+    cargando: 'Cargando',
   },
   en: {
     metaTitulo: 'Salomón Barrios — Digital artist, painter',
@@ -52,7 +52,6 @@ export const DICCIONARIO = {
     nav: { bio: 'BIO', work: 'WORK', contacto: 'CONTACT', cv: 'CV' },
     labels: { bio: 'bio.1', work: 'work.2', contacto: 'Contact.3', cv: 'CV.4' },
     idioma: 'Language',
-    sobreLaObra: 'About the work',
     verObra: 'View work',
     videoDeLaObra: 'Video of the work',
     procesoDeTrabajo: 'Work process',
@@ -62,6 +61,7 @@ export const DICCIONARIO = {
     pagina: 'Page',
     paginasCv: 'CV pages',
     paginasDeclaracion: 'Artist statement pages',
+    cargando: 'Loading',
   },
 } as const;
 

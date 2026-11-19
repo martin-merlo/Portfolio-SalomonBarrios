@@ -1,57 +1,33 @@
-import { textos, type Idioma } from '@/lib/i18n';
-import { fondoImagen } from '@/lib/imagen';
+import Image from 'next/image';
 
 /**
- * Hero de /obra/[slug] — mismo tratamiento visual que el Hero del home
- * (velo oscuro, tipografía Sekuya para el título grande). Sticky + z-0 igual
- * que el del home: si más abajo hay contenido extendido envuelto en
- * PaperSurface (z-10, flujo normal), lo cubre al scrollear con el mismo
- * truco puramente CSS. Si no hay nada debajo, el hero ocupa la pantalla y
- * listo — sin ningún hueco extra.
+ * Hero de /obra/[slug]: una franja con la imagen de la obra que asoma arriba,
+ * detrás de la ola del papel (pedido del artista: la página arranca ya tapada
+ * por la hoja). El título va sobre el papel, en la página.
+ *
+ * Sticky + z-0 igual que el del home: PaperSurface (z-10, flujo normal) arranca
+ * con el valle de la ola justo en el borde inferior de esta franja (su margen
+ * negativo de -19.6% del ancho ya hace eso) y la termina de tapar al scrollear,
+ * con el mismo truco puramente CSS.
+ *
+ * Alto: 31% de la pantalla (como la referencia del artista), con un mínimo de
+ * 160px para que en pantallas muy bajas siga asomando algo de la obra debajo
+ * del navbar (72px).
+ *
+ * SIN data-aberracion: en la página de obra la imagen se ve limpia (ver
+ * AberracionCromatica). next/image con priority: es lo primero que se ve.
  */
-export default function ObraHero({
-  titulo,
-  imagenUrl,
-  descripcion,
-  idioma,
-}: {
-  titulo: string;
-  imagenUrl: string;
-  descripcion: string;
-  idioma: Idioma;
-}) {
+export default function ObraHero({ imagenUrl }: { imagenUrl: string }) {
   return (
     <section
       id="obra-hero"
       data-protegida
-      className="sticky top-0 z-0 w-full overflow-hidden bg-tinta"
-      style={{
-        height: 'calc(100vh - 100px)',
-        backgroundImage: fondoImagen(imagenUrl),
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
+      className="sticky top-0 z-0 w-full overflow-hidden bg-tinta h-[max(31vh,160px)]"
     >
+      {imagenUrl && (
+        <Image src={imagenUrl} alt="" fill priority sizes="100vw" className="object-cover object-center" />
+      )}
       <div className="absolute inset-0 bg-tinta/45" aria-hidden="true" />
-
-      <div className="relative z-10 h-full max-w-[1500px] mx-auto px-5 sm:px-10 lg:px-14 pt-16 md:pt-0 flex flex-col justify-center gap-10 md:flex-row md:items-center md:justify-between md:gap-12">
-        <div>
-          {/* text-[12vw], no 15vw: ver la misma nota en Hero.tsx — con 15vw un
-              título largo se sale del viewport en 360/390px. */}
-          <h1 data-aberracion="texto" className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]">
-            {titulo}
-          </h1>
-        </div>
-
-        <div className="max-w-sm md:mt-2 md:text-right">
-          <h2 className="font-mono uppercase tracking-wide text-claro text-sm sm:text-base mb-3">
-            {textos(idioma).sobreLaObra}
-          </h2>
-          <p className="font-mono text-claro/85 text-xs sm:text-sm leading-relaxed text-left md:text-right">
-            {descripcion}
-          </p>
-        </div>
-      </div>
     </section>
   );
 }
