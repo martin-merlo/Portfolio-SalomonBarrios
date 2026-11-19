@@ -60,11 +60,19 @@ export default function Hero({ contenido, idioma }: { contenido: ContenidoSitio;
       >
         {/* Mobile/tablet chico (< md): columna que arranca debajo del navbar y
             del toggle de idioma (pt-[108px]) y deja abajo el alto de la ola del
-            papel (pb = 19.6vw, su pico, + aire); la declaración ocupa el alto
-            que sobra (ver DeclaracionPaginada). Así nada se pisa aunque el
-            subtítulo ocupe varias líneas o la pantalla sea baja. Desde md: fila
-            centrada, como siempre. */}
-        <div className="h-full px-5 sm:px-10 lg:px-14 pt-[108px] sm:pt-[124px] pb-[calc(19.6vw+14px)] md:pt-0 md:pb-0 flex flex-col justify-start gap-6 max-md:[@media(max-height:700px)]:gap-4 sm:gap-8 md:flex-row md:items-center md:justify-between md:gap-12">
+            papel (pb = 4.3vw + aire: la ola sube 4.22% del ancho sobre el borde
+            del hero, medido en forma-recorte.png; antes se reservaba 19.6vw, que
+            es dónde cae el valle, y se perdían ~60px en celular); la declaración
+            ocupa el alto que sobra (ver DeclaracionPaginada). Así nada se pisa
+            aunque el subtítulo ocupe varias líneas o la pantalla sea baja. Desde
+            md: fila centrada, como siempre.
+            bajo: (pantallas apaisadas de 480px de alto o menos, ver globals.css):
+            también en fila, pero arrancando debajo del navbar y con el título
+            dimensionado por el alto, porque centrada no entraba. Lleva `!` en
+            lo que pisa la regla max-md:[@media(max-height:700px)] (celulares
+            bajos): Tailwind ordena esas variantes escritas a mano después de las
+            nombradas, así que sin `!` ganaban en los apaisados de < 768px. */}
+        <div className="h-full px-5 sm:px-10 lg:px-14 pt-[108px] sm:pt-[124px] pb-[calc(4.3vw+14px)] md:pt-0 md:pb-0 flex flex-col justify-start gap-6 max-md:[@media(max-height:700px)]:gap-4 sm:gap-8 md:flex-row md:items-center md:justify-between md:gap-12 bajo:flex-row bajo:items-center bajo:justify-between bajo:gap-8! bajo:pt-[72px] bajo:pb-[calc(4.3vw+8px)]">
           {/*
             Posición del título: prioriza la COMPOSICIÓN en reposo (como en
             referencia/diseño.pdf, donde el título arranca a ~12% del ancho) por
@@ -101,12 +109,12 @@ export default function Hero({ contenido, idioma }: { contenido: ContenidoSitio;
             <h1
               id="hero-title"
               data-aberracion="texto"
-              className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] max-md:[@media(max-height:700px)]:text-[10.5vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw]"
+              className="font-display uppercase text-claro leading-[0.92] break-words text-[12vw] max-md:[@media(max-height:700px)]:text-[10.5vw] sm:text-[10vw] md:text-[6.2vw] lg:text-[5.4vw] bajo:text-[min(6.2vw,11vh)]!"
               style={{ transformOrigin: 'left center', position: 'relative' }}
             >
               {contenido.heroTitulo}
             </h1>
-            <p id="hero-sub" className="font-mono text-claro/90 mt-4 sm:mt-6 text-sm sm:text-base">
+            <p id="hero-sub" className="font-mono text-claro/90 mt-4 sm:mt-6 text-sm sm:text-base bajo:mt-3 bajo:text-sm">
               {contenido.heroSubtitulo}
             </p>
           </div>

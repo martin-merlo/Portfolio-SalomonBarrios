@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Pantallas muy bajas y apaisadas (celulares de costado, ventanas con mucho
+   zoom): el hero no tiene alto para apilar título y declaración, así que van en
+   fila debajo del navbar, con el selector de idioma dentro de la fila del
+   navbar. Ver Hero.tsx, DeclaracionPaginada.tsx y Navbar.tsx. */
+@custom-variant bajo (@media (max-height: 480px) and (orientation: landscape));
+
 /* ---------------------------------------------------------------------
  * Self-hosted: PS Pimpdeed / PS Pimpdeed II
  * Archivos pendientes — ver public/fonts/README.md. @font-face plano

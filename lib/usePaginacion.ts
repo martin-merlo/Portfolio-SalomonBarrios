@@ -17,17 +17,27 @@ import { paginarHtml } from './paginarHtml';
  * ventana y también la caja que toma el alto sobrante del hero en mobile, que
  * cambia cuando cargan las fuentes del título/subtítulo) y cuando terminan de
  * cargar las fuentes. Sólo para componentes de cliente.
+ *
+ * El tamaño se compara contra el que se usó en el ÚLTIMO paginado, no contra el
+ * aviso anterior del ResizeObserver. Antes se ignoraba su primer aviso, y si la
+ * caja cambiaba entre el paginado inicial y ese aviso (la fuente del título
+ * terminaba de cargar justo ahí), las páginas quedaban armadas para el alto
+ * viejo y el texto se cortaba. Medido en 390x844: páginas de 312px en una caja
+ * de 275px.
  */
 export function usePaginacion(html: string, clase: string) {
   const contenedorRef = useRef<HTMLDivElement>(null);
   const [paginas, setPaginas] = useState<string[]>([html]);
   const [pagina, setPagina] = useState(0);
   const total = paginas.length;
+  // Tamaño de la caja con el que se armaron las páginas actuales.
+  const paginado = useRef({ w: -1, h: -1 });
 
   const recalcular = useCallback(() => {
     const el = contenedorRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
+    paginado.current = { w: rect.width, h: rect.height };
     const nuevas = paginarHtml(html, rect.height, rect.width, clase);
     setPaginas(nuevas);
     setPagina((actual) => (actual >= nuevas.length ? 0 : actual));
@@ -37,18 +47,16 @@ export function usePaginacion(html: string, clase: string) {
     recalcular();
 
     let resizeTimer: ReturnType<typeof setTimeout>;
-    let ultimo = { w: -1, h: -1 };
     function onResize() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(recalcular, 150);
     }
-    // Sólo si cambió el tamaño de la caja (no por cualquier re-layout).
+    // Sólo si la caja ya no mide lo que medía al paginar (no por cualquier re-layout).
     const ro = new ResizeObserver(([entrada]) => {
       const { width, height } = entrada.contentRect;
-      if (Math.abs(width - ultimo.w) < 0.5 && Math.abs(height - ultimo.h) < 0.5) return;
-      const primera = ultimo.w < 0;
-      ultimo = { w: width, h: height };
-      if (!primera) onResize();
+      const { w, h } = paginado.current;
+      if (Math.abs(width - w) < 0.5 && Math.abs(height - h) < 0.5) return;
+      onResize();
     });
     if (contenedorRef.current) ro.observe(contenedorRef.current);
 

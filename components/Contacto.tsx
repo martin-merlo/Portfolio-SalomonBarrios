@@ -35,11 +35,14 @@ function IconoTikTok() {
 export default function Contacto({ contenido, idioma }: { contenido: ContenidoSitio; idioma: Idioma }) {
   const tx = textos(idioma);
   return (
-    <section id="contacto" className={`${MARGEN_PAPEL} scroll-mt-16 sm:scroll-mt-[72px] pb-20 sm:pb-28`}>
+    // Compacto a propósito (pedido del artista): al llegar desde el navbar se
+    // ven el contacto y el carrusel de proceso a la vez. Sin padding inferior:
+    // el aire hasta el carrusel lo pone el padding propio de Proceso.
+    <section id="contacto" className={`${MARGEN_PAPEL} scroll-mt-16 sm:scroll-mt-[72px]`}>
       <div className="max-w-[1500px] mx-auto">
         <SectionLabel texto={tx.labels.contacto} entradaPanel />
 
-        <div className="flex flex-col items-center text-center gap-5 sm:gap-6 py-6 sm:py-10">
+        <div className="flex flex-col items-center text-center gap-5 sm:gap-6 pt-4 sm:pt-6">
           <a
             href={`tel:${contenido.contactoTelefono.replace(/\s+/g, '')}`}
             className="font-cuerpo text-tinta text-lg sm:text-xl hover:opacity-70 transition-opacity"
@@ -74,20 +77,22 @@ export default function Contacto({ contenido, idioma }: { contenido: ContenidoSi
             </a>
           </div>
 
-          {/* -mb: firma.png es un cuadrado con el trazo centrado y un 32% de su
-              alto transparente DEBAJO del trazo (346 de 1080px) — 90px a 280px
-              de ancho, 115px a 360px. Cuando la firma cerraba la página ese aire
-              no se notaba; desde que Contacto va antes del carrusel y el CV,
-              dejaba un hueco de papel vacío. Se compensa para que el espacio
-              hasta el carrusel sea el margen normal entre secciones. */}
-          <div className="mt-10 sm:mt-16 -mb-[90px] sm:-mb-[115px]">
+          {/* firma.png está recortada al trazo (6px de margen sobre el original
+              de 1080x1080, que tenía un tercio de aire transparente arriba y
+              otro abajo, y lo dejaba descentrado). Así los espacios de acá son
+              los reales y el trazo mide lo mismo que antes: 160px de ancho en
+              mobile y 206px desde sm.
+              data-protegida: sin clic derecho → "Guardar imagen" ni arrastre,
+              igual que las obras (ver ProtegerObras). */}
+          <div data-protegida className="mt-3 sm:mt-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/imagenes/firma.png"
               alt={tx.firma}
-              width={360}
-              height={360}
-              className="w-[280px] sm:w-[360px] h-auto"
+              width={631}
+              height={364}
+              draggable={false}
+              className="w-[164px] sm:w-[210px] h-auto"
             />
           </div>
         </div>

@@ -53,6 +53,7 @@ const TONOS = {
     punto: 'w-2.5 h-2.5',
     activo: 'bg-tinta border-tinta',
     inactivo: 'border-tinta/35 hover:border-tinta',
+    contador: 'text-tinta/70',
   },
   // Sobre el hero oscuro (Declaración): claros, un poco más chicos y
   // translúcidos para no competir con el título grande del hero.
@@ -62,6 +63,7 @@ const TONOS = {
     punto: 'w-2 h-2',
     activo: 'bg-claro border-claro',
     inactivo: 'border-claro/50 hover:border-claro',
+    contador: 'text-claro/85',
   },
 } as const;
 
@@ -76,6 +78,12 @@ interface ControlesPaginasProps {
   /** Idioma de los aria-label de flechas y puntos. */
   idioma: Idioma;
   className?: string;
+  /**
+   * En pantallas apaisadas bajas (bajo:, ver globals.css) cambia los puntos por
+   * un contador "3 / 11": ahí la caja es chica, hay muchas páginas y los puntos
+   * se partían en dos o tres filas.
+   */
+  contadorEnBajo?: boolean;
 }
 
 export function ControlesPaginas({
@@ -87,6 +95,7 @@ export function ControlesPaginas({
   etiqueta,
   idioma,
   className = '',
+  contadorEnBajo = false,
 }: ControlesPaginasProps) {
   const t = TONOS[tono];
   const tx = textos(idioma);
@@ -96,7 +105,13 @@ export function ControlesPaginas({
         ‹
       </button>
 
-      <div role="tablist" aria-label={etiqueta} className="flex flex-wrap gap-2">
+      {contadorEnBajo && (
+        <span className={`hidden bajo:inline font-mono text-xs tabular-nums ${t.contador}`}>
+          {pagina + 1} / {total}
+        </span>
+      )}
+
+      <div role="tablist" aria-label={etiqueta} className={`flex flex-wrap gap-2 ${contadorEnBajo ? 'bajo:hidden' : ''}`}>
         {Array.from({ length: total }, (_, i) => (
           <button
             key={i}

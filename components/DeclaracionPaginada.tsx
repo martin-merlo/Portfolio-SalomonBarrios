@@ -12,13 +12,19 @@ import { ControlesPaginas, PistaPaginas } from './Paginacion';
 // (flex-1, ver Hero.tsx), así se adapta al largo del subtítulo y al alto del
 // teléfono sin pisar el toggle de idioma ni la ola del papel. La paginación
 // mide la caja real, así que recorta en tantas páginas como haga falta.
-const ALTO_CAJA = 'flex-1 min-h-[72px] md:flex-none md:h-[min(55vh,calc(100vh_-_340px))]';
+// bajo: (apaisado de 480px de alto o menos, ver globals.css): el alto que queda
+// en la columna = hero (100vh − 100px) − navbar (72px) − ola (4.3vw + 8px) −
+// título del bloque (28px) − controles (40px). Mínimo de 3 líneas.
+const ALTO_CAJA =
+  'flex-1 min-h-[72px] md:flex-none md:h-[min(55vh,calc(100vh_-_340px))] bajo:flex-none bajo:min-h-[58px] bajo:h-[calc(100vh_-_248px_-_4.3vw)]';
 
 // Tipografía del cuerpo de la declaración: 2px más chica que la original
 // (12/14/16px, antes 14/16/18px) para que entre más texto por página. + formato
 // del editor (texto-rico) con párrafos separados por una línea en blanco.
+// bajo: 12px e interlineado normal en vez de relaxed: con la caja de ~100px de
+// un celular apaisado entran 5 líneas por página en vez de 3 o 4.
 const CLASE_TEXTO =
-  'texto-rico texto-rico--lineas font-mono text-claro/85 text-xs sm:text-sm lg:text-base leading-relaxed text-left';
+  'texto-rico texto-rico--lineas font-mono text-claro/85 text-xs sm:text-sm lg:text-base leading-relaxed bajo:text-xs bajo:leading-normal text-left';
 
 /**
  * Declaración del artista (bloque a la derecha del hero), paginada
@@ -52,8 +58,8 @@ export default function DeclaracionPaginada({ titulo, html, idioma }: { titulo: 
   const { contenedorRef, paginas, pagina, setPagina, ir, total } = usePaginacion(html, CLASE_TEXTO);
 
   return (
-    <div id="hero-declaracion" className="flex flex-1 min-h-0 flex-col md:block md:flex-initial w-full min-w-0 max-w-sm md:max-w-md lg:max-w-[min(40vw,640px)] md:mt-2 lg:mr-6 xl:mr-10 [&_a[href]]:pointer-events-auto">
-      <h2 className="font-mono uppercase tracking-wide text-claro text-base sm:text-lg lg:text-xl mb-3">
+    <div id="hero-declaracion" className="flex flex-1 min-h-0 flex-col md:block md:flex-initial w-full min-w-0 max-w-sm md:max-w-md lg:max-w-[min(40vw,640px)] md:mt-2 lg:mr-6 xl:mr-10 bajo:block bajo:flex-initial bajo:mt-0 [&_a[href]]:pointer-events-auto">
+      <h2 className="font-mono uppercase tracking-wide text-claro text-base sm:text-lg lg:text-xl mb-3 bajo:text-sm bajo:mb-2">
         {titulo}
       </h2>
 
@@ -74,7 +80,8 @@ export default function DeclaracionPaginada({ titulo, html, idioma }: { titulo: 
           tono="claro"
           etiqueta={textos(idioma).paginasDeclaracion}
           idioma={idioma}
-          className="mt-4 pointer-events-auto"
+          className="mt-4 bajo:mt-2 pointer-events-auto"
+          contadorEnBajo
         />
       )}
     </div>

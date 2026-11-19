@@ -32,7 +32,8 @@ const NAVBG_MAX_OPACITY = 0.8;
  * Título anclado al navbar — mecánica portada de referencia/demos/anchor.html.
  * Mide la posición del título del hero y la del slot del navbar, y anima
  * x/y/scale con scrub (FLIP manual). En mobile reemplaza esa transición de
- * posición por un crossfade simple. Recalcula todo en resize (debounced).
+ * posición por un crossfade simple. Recalcula todo en resize (debounced) y al
+ * cambiar de idioma.
  */
 export default function Navbar({ heroTitulo, idioma }: { heroTitulo: string; idioma: Idioma }) {
   const items = itemsMenu(idioma);
@@ -215,7 +216,10 @@ export default function Navbar({ heroTitulo, idioma }: { heroTitulo: string; idi
       clearTimeout(resizeTimer);
       if (st) st.kill();
     };
-  }, []);
+    // idioma: al cambiarlo (router.refresh, sin resize) el subtítulo puede
+    // cambiar de cantidad de líneas y correr el título; hay que volver a medir
+    // o aterriza corrido (medido: 12px en 1366x650).
+  }, [idioma]);
 
   return (
     <nav className="fixed top-0 inset-x-0 z-50 h-16 sm:h-[72px] flex items-center justify-between gap-2 px-3 sm:px-8 lg:px-12">
@@ -236,9 +240,11 @@ export default function Navbar({ heroTitulo, idioma }: { heroTitulo: string; idi
       {/* Mobile: gap-1.5 + tracking normal (y 11px por debajo de 360px) para que
           BIO · WORK · CONTACTO · CV entre en una fila junto al nombre aun a
           320px; desde sm: los mismos valores de siempre. */}
-      <div className="relative z-10 flex items-center gap-10 xl:gap-12 shrink-0">
-        {/* Toggle ES/EN: desde lg en la fila, a la izquierda de BIO con aire. */}
-        <SelectorIdioma idioma={idioma} className="hidden lg:flex" />
+      <div className="relative z-10 flex items-center gap-10 xl:gap-12 bajo:gap-4 shrink-0">
+        {/* Toggle ES/EN: desde lg en la fila, a la izquierda de BIO con aire.
+            También en pantallas apaisadas bajas (bajo:): debajo del navbar
+            tapaba la declaración, y en la fila entra desde 568px de ancho. */}
+        <SelectorIdioma idioma={idioma} className="hidden lg:flex bajo:flex" />
         <ul className="flex gap-1.5 sm:gap-6 lg:gap-8 font-mono font-bold uppercase text-[11px] min-[360px]:text-xs sm:text-base lg:text-lg tracking-normal sm:tracking-wide text-claro">
           {items.map((item) => (
             <li key={item.href}>
@@ -251,7 +257,7 @@ export default function Navbar({ heroTitulo, idioma }: { heroTitulo: string; idi
       </div>
       {/* Mobile y tablet (< lg): en la fila no entra (los 4 ítems ya llenan el
           ancho a 320px), así que va fijo justo debajo del navbar, a la derecha. */}
-      <SelectorIdioma idioma={idioma} className="lg:hidden absolute top-full right-3 sm:right-8 mt-2" />
+      <SelectorIdioma idioma={idioma} className="lg:hidden bajo:hidden absolute top-full right-3 sm:right-8 mt-2" />
     </nav>
   );
 }
